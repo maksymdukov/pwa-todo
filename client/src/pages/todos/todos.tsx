@@ -3,12 +3,19 @@ import { Route, RouteComponentProps, Switch } from "react-router";
 import TodosView from "pages/todos/components/todos-view";
 import SingleTodo from "pages/single-todo";
 import { useDispatch } from "react-redux";
-import { syncTodos } from "store/todos/todos.actions";
+import { syncTodos, setTodoItems } from "store/todos/todos.actions";
+import { idb, DBNames } from "services/idb.service";
 
 const Todos = ({ match }: RouteComponentProps) => {
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(syncTodos());
+    (async () => {
+      // Get todos from db
+      const dbTodos = await idb.readAllData(DBNames.syncTodos);
+      dispatch(setTodoItems({ items: dbTodos }));
+      // Then try syncing on mount
+      dispatch(syncTodos());
+    })();
   }, [dispatch]);
   return (
     <Switch>

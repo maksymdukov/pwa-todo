@@ -6,6 +6,9 @@ export type TodosStateType = {
   syncStatus: boolean;
 };
 
+// TODO
+// load initial items from DB
+
 const initialState: TodosStateType = {
   items: [],
   syncStatus: true,

@@ -81,6 +81,7 @@ const findAllUserRelatedTodos: TodoModel['findAllUserRelatedTodos'] = async func
   page,
   size
 ) {
+  const timestamp = Date.now();
   const { pg, sz, pgQuery } = getPaginationQuery({ page, size });
 
   const query: mongoose.FilterQuery<TodoDocument> = {
@@ -110,6 +111,7 @@ const findAllUserRelatedTodos: TodoModel['findAllUserRelatedTodos'] = async func
     page: pg,
     size: sz,
     total,
+    timestamp,
   };
 };
 

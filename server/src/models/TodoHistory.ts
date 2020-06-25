@@ -35,7 +35,16 @@ export const todoHistorySchema = new mongoose.Schema(
       required: true,
     },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+    toJSON: {
+      virtuals: true,
+      versionKey: false,
+      transform: function (doc, ret) {
+        delete ret._id;
+      },
+    },
+  }
 );
 
 const build: TodoHistoryModel['build'] = function (attrs) {

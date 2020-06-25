@@ -8,6 +8,7 @@ export interface PaginatedOutput<T> {
   total: number;
   size: number;
   page: number;
+  timestamp?: string;
 }
 
 const DEFAULT_PAGE_NUMBER = '1';
