@@ -9,7 +9,7 @@ import {
   makeStyles,
   Typography,
   Button,
-  SvgIcon
+  SvgIcon,
 } from "@material-ui/core";
 import { useSelector } from "react-redux";
 import { getIsAuthenticated } from "store/user/selectors";
@@ -36,30 +36,30 @@ const links: IMenuLink[] = [
       {
         label: "My",
         icon: PermIdentityRoundedIcon,
-        to: "/my"
+        to: "/my",
       },
       {
         label: "Shared with me",
         icon: PeopleOutlineRoundedIcon,
-        to: "/shared"
-      }
-    ]
+        to: "/shared",
+      },
+    ],
   },
-  { label: "Notifications", icon: NotificationsIcon, to: "/notifications" }
+  { label: "Notifications", icon: NotificationsIcon, to: "/notifications" },
 ];
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   toolbar: theme.mixins.toolbar,
   logoutBtn: {
     margin: theme.spacing(),
-    marginTop: "auto"
+    marginTop: "auto",
   },
   notAuthWrapper: {
     flexGrow: 1,
     display: "flex",
     justifyContent: "center",
-    alignItems: "center"
-  }
+    alignItems: "center",
+  },
 }));
 
 export const DrawerContent = () => {

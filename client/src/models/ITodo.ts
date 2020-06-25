@@ -1,10 +1,22 @@
 export interface ITodo {
   id: string;
   title: string;
-  ownerId: string;
-  ownerFirstName: string;
-  ownerLastName: string;
-  ownerPicture?: string;
+  shared: {
+    id: string;
+    email: string;
+    profile: { firstName: string; lastName: string; picture: string };
+  }[];
+  creator: {
+    id: string;
+    email: string;
+    profile: {
+      firstName: string;
+      lastName: string;
+      picture: string;
+      createdAt: string;
+      updatedAt: string;
+    };
+  };
   created: string;
   records: ITodoRecord[];
 }

@@ -1,6 +1,7 @@
 import mongoose, { Schema, Types } from 'mongoose';
 import { TodoRecordDocument, todoRecordSchema } from './TodoRecord';
 import { UserDocument } from './User';
+import { getPaginationQuery, PaginatedOutput } from '../util/pagination';
 
 export type TodoDocument = mongoose.Document & {
   creator: Types.ObjectId | UserDocument;
@@ -11,7 +12,10 @@ export type TodoDocument = mongoose.Document & {
 };
 
 export type TodoModel = mongoose.Model<TodoDocument> & {
-  findTodosByCreatorId: findTodosByCreatorIdFunction;
+  findTodosByCreatorId: (
+    this: TodoModel,
+    creatorId: string
+  ) => Promise<TodoDocument[]>;
   findTodoById: (
     this: TodoModel,
     todoId: string
@@ -22,14 +26,11 @@ export type TodoModel = mongoose.Model<TodoDocument> & {
   ) => Promise<TodoDocument[] | null>;
   findAllUserRelatedTodos: (
     this: TodoModel,
-    userId: string
-  ) => Promise<TodoDocument[]>;
+    userId: string,
+    page?: string,
+    size?: string
+  ) => Promise<PaginatedOutput<TodoDocument>>;
 };
-
-export type findTodosByCreatorIdFunction = (
-  this: TodoModel,
-  creatorId: string
-) => Promise<TodoDocument[]>;
 
 const todoSchema = new mongoose.Schema(
   {
@@ -37,7 +38,7 @@ const todoSchema = new mongoose.Schema(
     title: String,
     created: { type: Date, default: Date.now },
     records: [todoRecordSchema],
-    shared: [{ type: Schema.Types.ObjectId, ref: 'User' }]
+    shared: [{ type: Schema.Types.ObjectId, ref: 'User' }],
   },
   { timestamps: false }
 );
@@ -45,12 +46,12 @@ const todoSchema = new mongoose.Schema(
 todoSchema.set('toJSON', {
   virtuals: true,
   versionKey: false,
-  transform: function(doc, ret) {
+  transform: function (doc, ret) {
     delete ret._id;
-  }
+  },
 });
 
-const findTodosByCreatorId: findTodosByCreatorIdFunction = async function(
+const findTodosByCreatorId: TodoModel['findTodosByCreatorId'] = async function (
   userId
 ) {
   return this.find({ creator: userId }, { createdAt: 0, updatedAt: 0 })
@@ -59,37 +60,57 @@ const findTodosByCreatorId: findTodosByCreatorIdFunction = async function(
     .exec();
 };
 
-const findTodoById: TodoModel['findTodoById'] = async function(todoId) {
+const findTodoById: TodoModel['findTodoById'] = async function (todoId) {
   return this.findById(todoId)
     .populate('creator', 'email id profile')
     .populate('shared', 'email id profile');
 };
 
-const findTodosBySharedId: TodoModel['findTodosBySharedId'] = async function(
+const findTodosBySharedId: TodoModel['findTodosBySharedId'] = async function (
   userId
 ) {
+  // @ts-ignore
   return this.find({ shared: userId }, { shared: 0 }).populate(
     'creator',
     'email id profile'
   );
 };
 
-const findAllUserRelatedTodos: TodoModel['findAllUserRelatedTodos'] = async function(
-  userId
+const findAllUserRelatedTodos: TodoModel['findAllUserRelatedTodos'] = async function (
+  userId,
+  page,
+  size
 ) {
-  const todos = await this.find({
-    $or: [{ creator: userId }, { shared: userId }]
-  })
+  const { pg, sz, pgQuery } = getPaginationQuery({ page, size });
+
+  const query: mongoose.FilterQuery<TodoDocument> = {
+    $or: [
+      { creator: mongoose.Types.ObjectId(userId) },
+      { shared: mongoose.Types.ObjectId(userId) },
+    ],
+  };
+  const todos = await this.find(query)
     .populate('creator', 'email id profile')
     .populate('shared', 'email id profile')
-    .sort({ created: 1 });
-  return todos.map(doc => {
+    .limit(pgQuery.limit)
+    .skip(pgQuery.skip)
+    .sort({ updatedAt: -1 });
+  const total = await this.countDocuments(query);
+  const sanitizedTotos = todos.map((doc) => {
     const todo = doc.toJSON();
     if ((todo.creator as UserDocument).id !== userId) {
-      delete todo.shared;
+      todo.shared = todo.shared.filter(
+        (shared: UserDocument) => shared.id === userId
+      );
     }
     return todo;
   });
+  return {
+    items: sanitizedTotos,
+    page: pg,
+    size: sz,
+    total,
+  };
 };
 
 todoSchema.statics.findTodosByCreatorId = findTodosByCreatorId;

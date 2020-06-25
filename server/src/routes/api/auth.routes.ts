@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import passport from 'passport';
-import { updateRefreshToken, generateUserTokens } from '../../controllers/api';
+import { updateRefreshToken, generateUserTokens } from '../../controllers/auth.controller';
 
 const authRouter = Router();
 

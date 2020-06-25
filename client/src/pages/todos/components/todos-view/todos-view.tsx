@@ -1,8 +1,9 @@
 import React from "react";
 import TodoList from "components/todo-list";
-import { mockedTodos } from "pages/todos/__mocks__/todos";
 import { RouteComponentProps } from "react-router";
 import Spinner from "components/spinner";
+import { useSelector } from "react-redux";
+import { getTodoItems, getSyncState } from "store/todos/todos.selectors";
 
 type TodosScopes = "all" | "my" | "shared";
 
@@ -22,11 +23,13 @@ const getPageLabel = (scope: TodosScopes): string => {
 };
 
 const TodosView = ({ scope }: TodosViewProps) => {
+  const todos = useSelector(getTodoItems);
+  const syncing = useSelector(getSyncState);
   return (
     <div>
       {getPageLabel(scope)}
-      <Spinner isActive />
-      <TodoList todos={mockedTodos} />
+      <Spinner isActive={syncing && !todos.length} />
+      <TodoList todos={todos} />
     </div>
   );
 };

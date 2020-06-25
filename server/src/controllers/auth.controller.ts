@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
 import {
   generateAccessToken,
-  generateRefreshToken
+  generateRefreshToken,
 } from '../config/authentication/token';
-import { User, UserDocument } from '../models/User';
+import { User } from '../models/User';
 
 export async function generateUserTokens(req: Request, res: Response) {
   const user = req.user;
@@ -17,7 +17,7 @@ export async function generateUserTokens(req: Request, res: Response) {
     accessToken,
     refreshToken,
     // TODO take origin from env
-    origin: 'http://localhost:3000/signin'
+    origin: 'http://localhost:3000/signin',
   });
 }
 

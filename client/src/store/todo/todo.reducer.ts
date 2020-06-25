@@ -15,16 +15,24 @@ const initialState: TodoStateType = {
     id: "",
     title: "",
     records: [],
+    creator: {
+      email: "",
+      id: "",
+      profile: {
+        createdAt: "",
+        firstName: "",
+        lastName: "",
+        picture: "",
+        updatedAt: "",
+      },
+    },
     created: new Date().toISOString(),
-    ownerPicture: "",
-    ownerFirstName: "",
-    ownerId: "",
-    ownerLastName: ""
+    shared: [],
   },
   fetchStatus: ActionStatus.NOT_STARTED,
   postStatus: ActionStatus.NOT_STARTED,
   fetchError: null,
-  postError: null
+  postError: null,
 };
 
 export const todoReducer = (
@@ -38,21 +46,21 @@ export const todoReducer = (
       return {
         ...state,
         postStatus: ActionStatus.FAILED,
-        postError: action.payload.error
+        postError: action.payload.error,
       };
     case todoActionTypes.POST_TODO_SUCCESS:
       return {
         ...state,
-        postStatus: ActionStatus.SUCCESS
+        postStatus: ActionStatus.SUCCESS,
       };
     case todoActionTypes.POST_TODO_RESET:
       return {
         ...state,
         postStatus: ActionStatus.NOT_STARTED,
-        postError: null
+        postError: null,
       };
     case todoActionTypes.LOAD_TODO:
-      return { ...state, item: action.payload };
+      return { ...state, item: action.payload.item };
     case todoActionTypes.SET_ID:
       return { ...state, item: { ...state.item, id: action.payload } };
     default:

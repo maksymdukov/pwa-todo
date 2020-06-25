@@ -11,18 +11,15 @@ export const Routes = () => {
   const isAuthenticated = useSelector(getIsAuthenticated);
   return (
     <Switch>
-      <Route path="/" exact>
-        Main page
-      </Route>
       <Route
         path="/signin"
         exact
-        render={props =>
-          isAuthenticated ? <Redirect to="/" /> : <SignIn {...props} />
+        render={(props) =>
+          isAuthenticated ? <Redirect to="/todos" /> : <SignIn {...props} />
         }
       />
-      <ProtectedRoute path="/profile" component={Profile} />
       <ProtectedRoute path="/todos" component={Todos} />
+      <ProtectedRoute path="/profile" component={Profile} />
       <Redirect to="/" />
     </Switch>
   );

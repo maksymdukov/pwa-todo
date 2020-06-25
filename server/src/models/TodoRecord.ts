@@ -6,7 +6,7 @@ export type TodoRecordDocument = mongoose.Document & {
   done: boolean;
 };
 
-export type TodoRecordModel = mongoose.Model<TodoRecordDocument> & {};
+export type TodoRecordModel = mongoose.Model<TodoRecordDocument>;
 
 export const todoRecordSchema = new mongoose.Schema(
   {

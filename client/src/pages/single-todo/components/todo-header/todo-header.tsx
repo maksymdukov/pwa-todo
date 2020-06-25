@@ -19,12 +19,12 @@ const TodoHeader = ({ todo, setTodo }: TodoHeaderProps) => {
         label="Title"
         variant="outlined"
         value={todo.title}
-        onChange={e => {
+        onChange={(e) => {
           setTodo({ ...todo, title: e.target.value });
         }}
       />
       <Typography>
-        Owner: {todo.ownerFirstName} {todo.ownerLastName}
+        Owner: {todo.creator.profile.firstName} {todo.creator.profile.lastName}
       </Typography>
     </Box>
   );

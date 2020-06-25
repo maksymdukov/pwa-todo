@@ -3,13 +3,13 @@ import {
   DragDropContext,
   Draggable,
   Droppable,
-  DropResult
+  DropResult,
 } from "react-beautiful-dnd";
 import TodoRecord from "pages/single-todo/components/single-todo/elements/todo-record";
 import { ITodoRecord } from "models/ITodo";
 import {
   getItemStyle,
-  getListStyle
+  getListStyle,
 } from "pages/single-todo/components/todo-records/todo-records.styles";
 import { reorder } from "pages/single-todo/components/todo-records/todo-records.utils";
 import NewRecord from "./elements/new-record";
@@ -47,11 +47,17 @@ const TodoRecords = ({ todoRecords, changeTodoRecords }: TodoRecordsProps) => {
       const updatedTodo = {
         ...todoRecords[idx],
         content: value,
-        localTimestamp: Date.now()
+        localTimestamp: Date.now(),
       };
-      changeTodoRecords(
-        todoRecords.map((todo, index) => (idx === index ? updatedTodo : todo))
-      );
+      if (value) {
+        changeTodoRecords(
+          todoRecords.map((todo, index) => (idx === index ? updatedTodo : todo))
+        );
+      } else {
+        changeTodoRecords(
+          todoRecords.filter((todo) => todo.id !== todoRecords[idx].id)
+        );
+      }
     },
     [changeTodoRecords, todoRecords]
   );
@@ -60,12 +66,13 @@ const TodoRecords = ({ todoRecords, changeTodoRecords }: TodoRecordsProps) => {
     const newTodo = {
       id: new Date().toISOString(),
       content: value,
-      done: false
+      done: false,
     };
     changeTodoRecords([...todoRecords, newTodo]);
   };
 
   useEffect(() => {
+    // TODO when record is deleted - focus on the previos record
     if (prevTodos.length < todoRecords.length && lastItemRef.current) {
       lastItemRef.current.focus();
       // move caret to the end
