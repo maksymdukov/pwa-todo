@@ -1,4 +1,4 @@
-import { DBSchema, IDBPDatabase, IDBPTransaction, openDB } from "idb";
+import { DBSchema, IDBPDatabase, IDBPTransaction, openDB, StoreKey } from "idb";
 import { ITodo, ITodoRecord } from "models/ITodo";
 
 export enum DBNames {
@@ -15,6 +15,7 @@ export interface MyDB extends DBSchema {
   [DBNames.keyval]: {
     key: string;
     value: string;
+    indexes: {};
   };
 }
 
@@ -40,7 +41,7 @@ export class IDB {
             autoIncrement: true,
           });
           database.createObjectStore(DBNames.keyval);
-          syncTodosStore.createIndex("byUpdatedAt", "parentId");
+          syncTodosStore.createIndex("byUpdatedAt", "updatedAt");
           syncTodosStore.createIndex("byId", "id");
         }
       },
@@ -59,17 +60,32 @@ export class IDB {
   async writeInTransaction<D extends DBNames>(
     st: D,
     data: MyDB[D]["value"][]
+    // predicate?: (
+    //   tx: IDBPTransaction<MyDB, [D]>
+    // ) => (item: MyDB[D]["value"]) => Promise<StoreKey<MyDB, D>>
   ): Promise<void> {
     const tx = (await this.db).transaction(st, "readwrite");
-    const promises = data.map((item) => tx.store.add(item));
+    // let promises = [];
+    // if (predicate) {
+    //   promises = data.map(predicate(tx));
+    // } else {
+    const promises = data.map((item) => tx.store.put(item));
+    // }
     await Promise.all(promises);
     return tx.done;
   }
 
-  readAllData<D extends DBNames>(st: D): Promise<MyDB[D]["value"][]> {
+  readAllData<D extends DBNames>(
+    st: D,
+    index?: keyof MyDB[D]["indexes"]
+  ): Promise<MyDB[D]["value"][]> {
     return this.db.then((db) => {
       const tx = db.transaction(st, "readonly");
       const store = tx.objectStore(st);
+      if (index) {
+        const idx = store.index(index);
+        return idx.getAll();
+      }
       return store.getAll();
     });
   }

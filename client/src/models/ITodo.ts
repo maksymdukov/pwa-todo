@@ -19,6 +19,8 @@ export interface ITodo {
   };
   created: string;
   records: ITodoRecord[];
+  createdAt: number;
+  updatedAt: number;
 }
 
 export interface ITodoRecord {

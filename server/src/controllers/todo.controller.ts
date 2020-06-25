@@ -185,16 +185,26 @@ export const revokeTodoShare = async (req: Request, res: Response) => {
 
 export const getChanges = async (req: Request, res: Response) => {
   const { lastTimeUpdated } = req.body;
+  const timeUpdated = Date.now();
 
-  const changes = await TodoHistory.find({
-    userId: req.user.id,
-    createdAt: { $gt: lastTimeUpdated },
-  }).populate({
-    path: 'todo',
-    populate: { path: 'shared', select: 'email profile' },
-  });
+  const changes = await TodoHistory.find(
+    {
+      userId: req.user.id,
+      createdAt: { $gt: lastTimeUpdated },
+    },
+    null,
+    { sort: { createdAt: 1 } }
+  )
+    .populate({
+      path: 'todo',
+      populate: { path: 'shared', select: 'email profile' },
+    })
+    .populate({
+      path: 'todo',
+      populate: { path: 'creator', select: 'email profile id' },
+    });
 
   console.log('changes', changes);
 
-  res.json(changes);
+  res.json({ items: changes, lastTimeUpdated: timeUpdated });
 };

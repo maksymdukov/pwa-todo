@@ -6,35 +6,39 @@ import {
   Typography,
   Button,
   CircularProgress,
-  makeStyles
+  makeStyles,
 } from "@material-ui/core";
 import MenuIcon from "@material-ui/icons/Menu";
+import CloudDoneOutlinedIcon from "@material-ui/icons/CloudDoneOutlined";
+
 import { drawerWidth } from "components/layout/layout";
 import { useSelector } from "react-redux";
 import { getIsAuthenticated, getIsAuthenticating } from "store/user/selectors";
 import { Link, useHistory } from "react-router-dom";
 import { AccountMenu } from "./account-menu";
+import { getSyncState } from "store/todos/todos.selectors";
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   title: {
-    flexGrow: 1
+    flexGrow: 1,
   },
   appBar: {
     [theme.breakpoints.up("sm")]: {
       width: `calc(100% - ${drawerWidth}px)`,
-      marginLeft: drawerWidth
-    }
+      marginLeft: drawerWidth,
+    },
   },
   menuButton: {
     marginRight: theme.spacing(2),
     [theme.breakpoints.up("sm")]: {
-      display: "none"
-    }
-  }
+      display: "none",
+    },
+  },
 }));
 
 export const Navbar = ({ onDrawerOpen }) => {
   const history = useHistory();
+  const syncing = useSelector(getSyncState);
   const isAuth = useSelector(getIsAuthenticated);
   const isAuthenticating = useSelector(getIsAuthenticating);
   const classes = useStyles();
@@ -68,6 +72,12 @@ export const Navbar = ({ onDrawerOpen }) => {
           >
             Sign in
           </Button>
+        )}
+        {isAuth && (
+          <>
+            {!syncing && <CloudDoneOutlinedIcon />}
+            {syncing && <CircularProgress color="inherit" size={20} />}
+          </>
         )}
         {isAuth && <AccountMenu />}
         {isAuthenticating && <CircularProgress color="inherit" />}

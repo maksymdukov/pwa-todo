@@ -32,7 +32,7 @@ const useStyles = makeStyles((theme) => ({
   itemActions: {},
 }));
 
-const TodoListItem = ({ title, creator, id, created }: ITodoListItem) => {
+const TodoListItem = ({ title, creator, id, updatedAt }: ITodoListItem) => {
   const classes = useStyles();
   return (
     <ListItem className={classes.item} to={`/todos/${id}`} component={Link}>
@@ -42,7 +42,7 @@ const TodoListItem = ({ title, creator, id, created }: ITodoListItem) => {
       <ListItemText>
         <div>
           <Typography variant="subtitle2">
-            Created: {new Date(created).toDateString()}
+            Updated: {new Date(updatedAt).toLocaleString()}
           </Typography>
           {title}
         </div>

@@ -4,14 +4,14 @@ import TodosView from "pages/todos/components/todos-view";
 import SingleTodo from "pages/single-todo";
 import { useDispatch } from "react-redux";
 import { syncTodos, setTodoItems } from "store/todos/todos.actions";
-import { idb, DBNames } from "services/idb.service";
+import { todosIDB } from "services/todos-idb.service";
 
 const Todos = ({ match }: RouteComponentProps) => {
   const dispatch = useDispatch();
   useEffect(() => {
     (async () => {
       // Get todos from db
-      const dbTodos = await idb.readAllData(DBNames.syncTodos);
+      const dbTodos = await todosIDB.getAllTodos();
       dispatch(setTodoItems({ items: dbTodos }));
       // Then try syncing on mount
       dispatch(syncTodos());

@@ -14,7 +14,10 @@ interface GetChangesAttrs {
   lastTimeUpdated: string;
 }
 
-type TodoChangesResponse = TodoHistoryChange[];
+type TodoChangesResponse = {
+  items: TodoHistoryChange[];
+  lastTimeUpdated: number;
+};
 
 class TodosService extends Base {
   createTodo(todo: Partial<ITodo>) {

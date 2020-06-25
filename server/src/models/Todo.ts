@@ -48,6 +48,8 @@ todoSchema.set('toJSON', {
   versionKey: false,
   transform: function (doc, ret) {
     delete ret._id;
+    ret.createdAt = new Date(ret.createdAt).getTime();
+    ret.updatedAt = new Date(ret.updatedAt).getTime();
   },
 });
 

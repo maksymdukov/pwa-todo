@@ -27,6 +27,8 @@ const initialState: TodoStateType = {
       },
     },
     created: new Date().toISOString(),
+    createdAt: 0,
+    updatedAt: 0,
     shared: [],
   },
   fetchStatus: ActionStatus.NOT_STARTED,
