@@ -1,9 +1,11 @@
-import { DBSchema, IDBPDatabase, IDBPTransaction, openDB, StoreKey } from "idb";
-import { ITodo, ITodoRecord } from "models/ITodo";
+import { DBSchema, IDBPDatabase, IDBPTransaction, openDB } from "idb";
+import { ITodo } from "models/ITodo";
+import { TodoRequest } from "models/ITodoRequest";
 
 export enum DBNames {
   syncTodos = "syncTodos",
   keyval = "keyval",
+  outboundTodos = "outboundTodos",
 }
 
 export interface MyDB extends DBSchema {
@@ -11,6 +13,11 @@ export interface MyDB extends DBSchema {
     key: string;
     value: ITodo;
     indexes: { byUpdatedAt: string; byId: string };
+  };
+  [DBNames.outboundTodos]: {
+    key: string;
+    value: TodoRequest;
+    indexes: { byCreatedAt: string; byId: string };
   };
   [DBNames.keyval]: {
     key: string;
@@ -40,37 +47,47 @@ export class IDB {
             keyPath: "id",
             autoIncrement: true,
           });
+          const outboutTodos = database.createObjectStore(
+            DBNames.outboundTodos,
+            {
+              keyPath: "id",
+              autoIncrement: true,
+            }
+          );
           database.createObjectStore(DBNames.keyval);
           syncTodosStore.createIndex("byUpdatedAt", "updatedAt");
           syncTodosStore.createIndex("byId", "id");
+          outboutTodos.createIndex("byCreatedAt", "createdAt");
+          outboutTodos.createIndex("byId", "id");
         }
       },
     });
   }
 
-  writeData(st: DBNames, data: any): Promise<void> {
+  writeData<D extends DBNames>(
+    st: D,
+    data: MyDB[D]["value"],
+    key?: string
+  ): Promise<void> {
     return this.db.then((db) => {
       const tx = db.transaction(st, "readwrite");
-      const store = tx.objectStore(st);
-      store.put(data);
+      const store = tx.store;
+      store.put(data, key);
       return tx.done;
     });
+  }
+
+  async deleteData<D extends DBNames>(st: D, key: string) {
+    const db = await this.db;
+    return db.delete(st, key);
   }
 
   async writeInTransaction<D extends DBNames>(
     st: D,
     data: MyDB[D]["value"][]
-    // predicate?: (
-    //   tx: IDBPTransaction<MyDB, [D]>
-    // ) => (item: MyDB[D]["value"]) => Promise<StoreKey<MyDB, D>>
   ): Promise<void> {
     const tx = (await this.db).transaction(st, "readwrite");
-    // let promises = [];
-    // if (predicate) {
-    //   promises = data.map(predicate(tx));
-    // } else {
     const promises = data.map((item) => tx.store.put(item));
-    // }
     await Promise.all(promises);
     return tx.done;
   }

@@ -13,14 +13,15 @@ export interface ITodo {
       firstName: string;
       lastName: string;
       picture: string;
-      createdAt: string;
-      updatedAt: string;
+      createdAt?: string;
+      updatedAt?: string;
     };
   };
-  created: string;
+  created?: string;
   records: ITodoRecord[];
   createdAt: number;
   updatedAt: number;
+  pending?: boolean;
 }
 
 export interface ITodoRecord {

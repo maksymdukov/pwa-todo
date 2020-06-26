@@ -15,14 +15,14 @@ export const generateAccessToken = (user: UserDocument): string => {
       firstName: user.profile.firstName || '',
       lastName: user.profile.lastName || '',
       picture: user.profile.picture || '',
-      email: user.email
+      email: user.email,
     },
     secret,
     {
       expiresIn,
       audience,
       issuer,
-      subject: user.id
+      subject: user.id,
     }
   );
 };
@@ -32,5 +32,5 @@ export const generateRefreshToken = (): {
   expiresAt: Date;
 } => ({
   refreshToken: randtoken.uid(256),
-  expiresAt: new Date(Date.now() + REFRESH_TOKEN_TTL)
+  expiresAt: new Date(Date.now() + REFRESH_TOKEN_TTL),
 });

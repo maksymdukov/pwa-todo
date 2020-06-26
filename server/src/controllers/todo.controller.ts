@@ -45,12 +45,11 @@ export const postTodo = async (req: Request, res: Response) => {
     records: TodoRecordDocument[];
   };
   const user = req.user as UserDocument;
-  const newTodo = new Todo({
+  const newTodo = await Todo.build({
     creator: user.id,
     title: title,
     records: records,
   });
-  await newTodo.save();
 
   // Save history record;
   const historyRecord = TodoHistory.build({
@@ -69,7 +68,7 @@ export const editTodo = async (req: Request, res: Response) => {
     records: TodoRecordDocument[];
   };
 
-  const todo = await Todo.findById(todoId);
+  const todo = await Todo.findTodoById(todoId);
   if (!todo) {
     return res.status(400).json({ errors: [{ message: 'not found' }] });
   }

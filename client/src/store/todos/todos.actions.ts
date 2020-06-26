@@ -24,6 +24,7 @@ export const syncTodos = (): AppThunk => async (dispatch, getState) => {
   try {
     const currentState = getState();
     dispatch(syncStart());
+    await todosIDB.syncOutboundRequests();
     if (!getTodoItems(currentState).length) {
       // full fetch
       const {

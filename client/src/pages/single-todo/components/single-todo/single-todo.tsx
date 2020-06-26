@@ -63,7 +63,7 @@ const SingleTodo = ({ match, isNew }: SingleTodoProps) => {
 
   return (
     <div className={classes.container}>
-      Create new todo
+      {isNew && "Create new todo"}
       <TodoHeader setTodo={setTodo} todo={todo} />
       <TodoRecords
         todoRecords={todo.records}

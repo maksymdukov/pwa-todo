@@ -1,11 +1,13 @@
 import { TodoActions, todoActionTypes } from "store/todo/todo.types";
-import { INewTodo, ITodo } from "models/ITodo";
+import { INewTodo, ITodo, ITodoRecord } from "models/ITodo";
 import { v4 as uuidv4 } from "uuid";
 import { AppThunk } from "store/tools";
 import { getUserState } from "store/user/selectors";
 import { history } from "providers";
 import { todosService } from "../../services/todos.service";
 import { getTodoItems } from "store/todos/todos.selectors";
+import { todosIDB } from "services/todos-idb.service";
+import { setTodoItems, syncTodos } from "store/todos/todos.actions";
 
 export const postTodoStart = (): TodoActions => ({
   type: todoActionTypes.POST_TODO_START,
@@ -28,18 +30,60 @@ export const postTodo = ({
   todo,
   isNew,
 }: {
-  todo: Partial<ITodo>;
+  todo: { title: string; records: ITodoRecord[]; id?: string };
   isNew: boolean;
-}): AppThunk => async (dispatch) => {
+}): AppThunk => async (dispatch, getState) => {
   try {
     dispatch(postTodoStart());
-    let response;
+    const timestamp = Date.now();
     if (isNew) {
-      response = await todosService.createTodo(todo);
+      const userState = getUserState(getState());
+      const newTodo: ITodo = {
+        id: String(timestamp),
+        createdAt: timestamp,
+        updatedAt: timestamp,
+        creator: {
+          email: userState.email,
+          id: userState.id,
+          profile: {
+            firstName: userState.firstName,
+            lastName: userState.lastName,
+            picture: userState.picture,
+          },
+        },
+        records: todo.records,
+        shared: [],
+        title: todo.title,
+        pending: true,
+      };
+
+      // Add request to IDB store outboundTodos
+      await todosIDB.createTodo(newTodo);
     } else {
-      response = await todosService.editTodo(todo);
+      const editedTodo = await todosIDB.getLocalTodo(todo.id!);
+      if (!editedTodo) {
+        throw new Error("Todo is not found in IDB when trying to edit it");
+      }
+
+      editedTodo.records = todo.records;
+      editedTodo.title = todo.title;
+      editedTodo.updatedAt = timestamp;
+      editedTodo.pending = true;
+
+      // Add request to IDB store outboutTodos
+      // Edit todo in IDB store syncTodos
+      // Try to send requests from outboundTodos
+      await todosIDB.editTodo(editedTodo);
     }
+
     dispatch(postTodoSuccess());
+    const dbTodos = await todosIDB.getAllTodos();
+    // save to redux
+    dispatch(setTodoItems({ items: dbTodos }));
+    history.push("/todos");
+
+    // Launch sync process
+    dispatch(syncTodos());
   } catch (e) {
     console.log(e);
     dispatch(postTodoFail(e));

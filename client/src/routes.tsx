@@ -20,7 +20,7 @@ export const Routes = () => {
       />
       <ProtectedRoute path="/todos" component={Todos} />
       <ProtectedRoute path="/profile" component={Profile} />
-      <Redirect to="/" />
+      <Redirect to="/todos" />
     </Switch>
   );
 };

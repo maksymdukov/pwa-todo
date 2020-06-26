@@ -11,7 +11,14 @@ export type TodoDocument = mongoose.Document & {
   shared: (Types.ObjectId | UserDocument)[];
 };
 
+interface TodoBuildAttrs {
+  creator: string;
+  title: string;
+  records: TodoRecordDocument[];
+}
+
 export type TodoModel = mongoose.Model<TodoDocument> & {
+  build: (attrs: TodoBuildAttrs) => Promise<TodoDocument>;
   findTodosByCreatorId: (
     this: TodoModel,
     creatorId: string
@@ -117,6 +124,21 @@ const findAllUserRelatedTodos: TodoModel['findAllUserRelatedTodos'] = async func
   };
 };
 
+const build: TodoModel['build'] = async ({ creator, records, title }) => {
+  const newTodo = new Todo({
+    creator: creator,
+    title: title,
+    records: records,
+  });
+  await newTodo.save();
+  await newTodo
+    .populate('creator', 'email id profile')
+    .populate('shared', 'email id profile')
+    .execPopulate();
+  return newTodo;
+};
+
+todoSchema.statics.build = build;
 todoSchema.statics.findTodosByCreatorId = findTodosByCreatorId;
 todoSchema.statics.findTodoById = findTodoById;
 todoSchema.statics.findTodosBySharedId = findTodosBySharedId;

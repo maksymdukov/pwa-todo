@@ -19,12 +19,19 @@ type TodoChangesResponse = {
   lastTimeUpdated: number;
 };
 
-class TodosService extends Base {
+export class TodosService extends Base {
   createTodo(todo: Partial<ITodo>) {
-    return this.request({ url: "/todo", method: "POST", data: todo });
+    return this.request<ITodo>({ url: "/todo", method: "POST", data: todo });
   }
   editTodo(todo: Partial<ITodo>) {
-    return this.request({ url: `/${todo.id}`, method: "PATCH", data: todo });
+    return this.request<ITodo>({
+      url: `/${todo.id}`,
+      method: "PATCH",
+      data: todo,
+    });
+  }
+  deleteTodo(todoId: string) {
+    return this.request({ url: `/${todoId}`, method: "DELETE" });
   }
   getAllTodos() {
     return this.request<AllTodosResponse>({ url: "/all", method: "GET" });
