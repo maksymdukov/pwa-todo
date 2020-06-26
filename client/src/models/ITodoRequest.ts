@@ -1,5 +1,3 @@
-import { ITodo } from "./ITodo";
-
 export enum TodoRequestTypes {
   edit = "edit",
   create = "create",
@@ -10,6 +8,7 @@ export interface TodoRequest {
   id: string;
   type: TodoRequestTypes;
   createdAt: number;
-  data: any;
+  data?: any;
+  meta?: any;
   syncing: boolean;
 }

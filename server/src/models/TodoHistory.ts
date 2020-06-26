@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import { TodoHistoryReason } from './TodoHistoryReason';
-import { TodoDocument } from './Todo';
+import { TodoDocument, todoSchema } from './Todo';
 
 export interface TodoHistoryDocument extends mongoose.Document {
   userId: string;
@@ -10,12 +10,12 @@ export interface TodoHistoryDocument extends mongoose.Document {
 
 export interface TodoHistoryAttrs {
   userId: string;
-  todoId: string;
+  todo: TodoDocument;
   reason: TodoHistoryReason;
 }
 
 export interface TodoHistoryModel extends mongoose.Model<TodoHistoryDocument> {
-  build(attrs: TodoHistoryAttrs): TodoHistoryDocument;
+  build(attrs: TodoHistoryAttrs): Promise<TodoHistoryDocument>;
 }
 
 export const todoHistorySchema = new mongoose.Schema(
@@ -25,8 +25,7 @@ export const todoHistorySchema = new mongoose.Schema(
       required: true,
     },
     todo: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Todo',
+      type: Object,
       required: true,
     },
     reason: {
@@ -47,12 +46,13 @@ export const todoHistorySchema = new mongoose.Schema(
   }
 );
 
-const build: TodoHistoryModel['build'] = function (attrs) {
-  return new TodoHistory({
+const build: TodoHistoryModel['build'] = async function (attrs) {
+  const history = new TodoHistory({
     userId: attrs.userId,
-    todo: attrs.todoId,
+    todo: attrs.todo.toJSON(),
     reason: attrs.reason,
   });
+  return history.save();
 };
 
 todoHistorySchema.statics.build = build;

@@ -115,3 +115,15 @@ export const setSingleTodo = (todoId: string): AppThunk => async (
     console.error(e);
   }
 };
+
+export const deleteTodoAction = (todoId: string): AppThunk => async (
+  dispatch
+) => {
+  await todosIDB.deleteTodo(todoId, Date.now());
+  // get all todos from db
+  const dbTodos = await todosIDB.getAllTodos();
+  // refresh redux todos
+  dispatch(setTodoItems({ items: dbTodos }));
+  // start syncing
+  dispatch(syncTodos());
+};

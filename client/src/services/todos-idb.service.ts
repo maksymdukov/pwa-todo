@@ -94,13 +94,13 @@ class TodosIDB {
   }
 
   async deleteTodo(todoId: string, timestamp: number) {
-    // if it's newly created TODO that isn't synced yet, then delete Request and return;
+    // if it's newly created TODO that isn't synced yet, then delete Request and return (do not create outbound request);
     // if there's already Edit request with this id, then delete request.
     const existingRequest = await this.getOutboundRequest(todoId);
-    if (!existingRequest?.syncing) {
+    if (existingRequest && !existingRequest.syncing) {
       await this.deleteOutboundRequest(todoId);
-      await this.deleteLocalTodo(todoId);
       if (existingRequest?.type === TodoRequestTypes.create) {
+        await this.deleteLocalTodo(todoId);
         return;
       }
     }
@@ -108,11 +108,10 @@ class TodosIDB {
       id: String(timestamp),
       type: TodoRequestTypes.delete,
       createdAt: timestamp,
-      data: {
-        meta: { id: todoId },
-      },
+      meta: { id: todoId },
       syncing: false,
     };
+    await this.deleteLocalTodo(todoId);
     await this.addOutboundRequest(request);
   }
 
@@ -159,7 +158,7 @@ class TodosIDB {
     await this.db.writeData(DBNames.syncTodos, response.data);
   }
   async handleDeletedTodoRequest(request: TodoRequest) {
-    await this.todosService.deleteTodo(request.data.id);
+    await this.todosService.deleteTodo(request.meta.id);
     await this.deleteOutboundRequest(request.id);
   }
 }

@@ -39,7 +39,7 @@ export type TodoModel = mongoose.Model<TodoDocument> & {
   ) => Promise<PaginatedOutput<TodoDocument>>;
 };
 
-const todoSchema = new mongoose.Schema(
+export const todoSchema = new mongoose.Schema(
   {
     creator: { type: Schema.Types.ObjectId, ref: 'User' },
     title: String,
@@ -47,18 +47,19 @@ const todoSchema = new mongoose.Schema(
     records: [todoRecordSchema],
     shared: [{ type: Schema.Types.ObjectId, ref: 'User' }],
   },
-  { timestamps: false }
+  {
+    timestamps: true,
+    toJSON: {
+      virtuals: true,
+      versionKey: false,
+      transform: function (doc, ret) {
+        delete ret._id;
+        ret.createdAt = new Date(ret.createdAt).getTime();
+        ret.updatedAt = new Date(ret.updatedAt).getTime();
+      },
+    },
+  }
 );
-
-todoSchema.set('toJSON', {
-  virtuals: true,
-  versionKey: false,
-  transform: function (doc, ret) {
-    delete ret._id;
-    ret.createdAt = new Date(ret.createdAt).getTime();
-    ret.updatedAt = new Date(ret.updatedAt).getTime();
-  },
-});
 
 const findTodosByCreatorId: TodoModel['findTodosByCreatorId'] = async function (
   userId

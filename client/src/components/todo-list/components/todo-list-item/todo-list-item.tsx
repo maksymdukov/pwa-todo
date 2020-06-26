@@ -8,10 +8,11 @@ import {
   Typography,
 } from "@material-ui/core";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
-import { ITodoListItem } from "models/ITodoListItem";
 import UserAvatar from "components/user-avatar/user-avatar";
 import { makeStyles } from "@material-ui/core/styles";
 import { Link } from "react-router-dom";
+import TodoMenu from "../todo-menu/todo-menu";
+import { ITodoListItem } from "models/ITodoListItem";
 
 const useStyles = makeStyles((theme) => ({
   item: {
@@ -32,14 +33,24 @@ const useStyles = makeStyles((theme) => ({
   itemActions: {},
 }));
 
-const TodoListItem = ({
-  title,
-  creator,
-  id,
-  updatedAt,
-  pending,
-}: ITodoListItem) => {
+interface TodoListItemProps {
+  todo: ITodoListItem;
+}
+
+const TodoListItem = (props: TodoListItemProps) => {
+  const {
+    todo: { title, creator, id, updatedAt, pending },
+  } = props;
   const classes = useStyles();
+
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const openMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const closeMenu = () => {
+    setAnchorEl(null);
+  };
+
   return (
     <ListItem className={classes.item} to={`/todos/${id}`} component={Link}>
       <ListItemAvatar>
@@ -55,9 +66,14 @@ const TodoListItem = ({
         </div>
       </ListItemText>
       <ListItemSecondaryAction>
-        <IconButton>
+        <IconButton onClick={openMenu}>
           <MoreVertIcon />
         </IconButton>
+        <TodoMenu
+          anchorEl={anchorEl}
+          handleClose={closeMenu}
+          todo={props.todo}
+        />
       </ListItemSecondaryAction>
     </ListItem>
   );

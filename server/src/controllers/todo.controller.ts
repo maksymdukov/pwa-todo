@@ -52,12 +52,11 @@ export const postTodo = async (req: Request, res: Response) => {
   });
 
   // Save history record;
-  const historyRecord = TodoHistory.build({
+  const historyRecord = await TodoHistory.build({
     userId: user.id,
-    todoId: newTodo.id,
+    todo: newTodo,
     reason: TodoHistoryReason.created,
   });
-  await historyRecord.save();
   res.json(newTodo);
 };
 
@@ -79,37 +78,36 @@ export const editTodo = async (req: Request, res: Response) => {
 
   title && (todo.title = title);
   records && (todo.records = records);
-  await todo.save();
+  const savedTodo = await todo.save();
+
+  console.log('todo', todo);
 
   // Savee history record
-  const historyRecord = TodoHistory.build({
+  const historyRecord = await TodoHistory.build({
     userId: req.user.id,
-    todoId: todo.id,
+    todo: savedTodo,
     reason: TodoHistoryReason.updated,
   });
-  await historyRecord.save();
   res.json(todo);
 };
 
 export const deleteTodo = async (req: Request, res: Response) => {
   const { todoId } = req.params;
-  const todo = await Todo.findById(todoId);
+  const todo = await Todo.findTodoById(todoId);
   if (!todo) {
     return res.status(400).json({ errors: [{ message: 'not found' }] });
   }
-  if (todo.creator !== req.user.id) {
+  if (!todo.creator.equals(req.user.id)) {
     return res.status(403).json({ errors: [{ message: 'Unathorized' }] });
   }
   await todo.remove();
 
   // Save history record
-  const historyRecord = TodoHistory.build({
+  const historyRecord = await TodoHistory.build({
     userId: req.user.id,
-    todoId: todo.id,
+    todo: todo,
     reason: TodoHistoryReason.deleted,
   });
-  await historyRecord.save();
-
   res.json({});
 };
 
@@ -135,13 +133,14 @@ export const shareTodo = async (req: Request, res: Response) => {
   todo.shared.push(userId);
   await todo.save();
 
+  const populatedTodo = await Todo.findTodoById(todoId);
+
   // Savee history record
-  const historyRecord = TodoHistory.build({
+  const historyRecord = await TodoHistory.build({
     userId: userId,
-    todoId: todo.id,
+    todo: populatedTodo,
     reason: TodoHistoryReason.shared,
   });
-  await historyRecord.save();
 
   // Webpush
   const userSub = await User.findById(userId);
@@ -171,13 +170,14 @@ export const revokeTodoShare = async (req: Request, res: Response) => {
   todo.shared = todo.shared.filter((usrId) => !usrId.equals(userId));
   await todo.save();
 
+  const populatedTodo = await Todo.findTodoById(todoId);
+
   // Savee history record
-  const historyRecord = TodoHistory.build({
+  const historyRecord = await TodoHistory.build({
     userId: userId,
-    todoId: todo.id,
+    todo: populatedTodo,
     reason: TodoHistoryReason.unshared,
   });
-  await historyRecord.save();
 
   res.end();
 };
@@ -193,16 +193,7 @@ export const getChanges = async (req: Request, res: Response) => {
     },
     null,
     { sort: { createdAt: 1 } }
-  )
-    .populate({
-      path: 'todo',
-      populate: { path: 'shared', select: 'email profile' },
-    })
-    .populate({
-      path: 'todo',
-      populate: { path: 'creator', select: 'email profile id' },
-    });
-
+  );
   console.log('changes', changes);
 
   res.json({ items: changes, lastTimeUpdated: timeUpdated });

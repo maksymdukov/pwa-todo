@@ -9,11 +9,11 @@ interface TodoListProps {
 }
 
 const TodoList = ({ todos }: TodoListProps) => {
-  const matches = useMediaQuery<Theme>(theme => theme.breakpoints.down("sm"));
+  const matches = useMediaQuery<Theme>((theme) => theme.breakpoints.down("sm"));
   return matches ? (
     <List>
-      {todos.map(todo => (
-        <TodoListItem key={todo.id} {...todo} />
+      {todos.map((todo) => (
+        <TodoListItem key={todo.id} todo={todo} />
       ))}
     </List>
   ) : (
