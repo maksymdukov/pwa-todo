@@ -65,6 +65,8 @@ export const todoReducer = (
       return { ...state, item: action.payload.item };
     case todoActionTypes.SET_ID:
       return { ...state, item: { ...state.item, id: action.payload } };
+    case todoActionTypes.RESET_TODO:
+      return initialState;
     default:
       return state;
   }

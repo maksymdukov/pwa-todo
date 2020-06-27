@@ -58,7 +58,10 @@ export const syncTodos = (): AppThunk => async (dispatch, getState) => {
         data: { items, lastTimeUpdated: newLastTimeUpdated },
       } = await todosService.getChanges({ lastTimeUpdated });
       console.log("changes: response.data", items);
-
+      if (!items.length) {
+        // no changes
+        return;
+      }
       // save/update to idb
       todosIDB.updateTodos(items, newLastTimeUpdated);
 

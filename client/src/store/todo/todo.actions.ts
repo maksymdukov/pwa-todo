@@ -1,10 +1,8 @@
 import { TodoActions, todoActionTypes } from "store/todo/todo.types";
-import { INewTodo, ITodo, ITodoRecord } from "models/ITodo";
-import { v4 as uuidv4 } from "uuid";
+import { ITodo, ITodoRecord } from "models/ITodo";
 import { AppThunk } from "store/tools";
 import { getUserState } from "store/user/selectors";
 import { history } from "providers";
-import { todosService } from "../../services/todos.service";
 import { getTodoItems } from "store/todos/todos.selectors";
 import { todosIDB } from "services/todos-idb.service";
 import { setTodoItems, syncTodos } from "store/todos/todos.actions";
@@ -24,6 +22,10 @@ export const postTodoFail = (error: string): TodoActions => ({
 
 export const postTodoReset = (): TodoActions => ({
   type: todoActionTypes.POST_TODO_RESET,
+});
+
+export const resetTodo = (): TodoActions => ({
+  type: todoActionTypes.RESET_TODO,
 });
 
 export const postTodo = ({

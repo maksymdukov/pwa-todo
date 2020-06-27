@@ -7,7 +7,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { getTodoItemState } from "store/todo/todo.selectors";
 import SaveTodoBtn from "./elements/save-todo-btn";
 import { ITodo, ITodoRecord } from "models/ITodo";
-import { postTodo, setSingleTodo } from "../../../../store/todo/todo.actions";
+import {
+  postTodo,
+  setSingleTodo,
+  resetTodo,
+} from "../../../../store/todo/todo.actions";
 import { getSyncState } from "store/todos/todos.selectors";
 
 type SingleTodoProps = RouteComponentProps<{ id?: string }> & {
@@ -20,6 +24,12 @@ const SingleTodo = ({ match, isNew }: SingleTodoProps) => {
   const syncing = useSelector(getSyncState);
   const dispatch = useDispatch();
   const [todo, setTodo] = useState<ITodo>(todoToEdit);
+
+  useEffect(() => {
+    return () => {
+      dispatch(resetTodo());
+    };
+  }, [dispatch]);
 
   useEffect(() => {
     if (isNew) {

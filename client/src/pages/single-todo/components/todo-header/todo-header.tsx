@@ -14,6 +14,7 @@ const TodoHeader = ({ todo, setTodo }: TodoHeaderProps) => {
       justifyContent="space-between"
       alignItems="center"
       mt={2}
+      mb={2}
     >
       <TextField
         label="Title"

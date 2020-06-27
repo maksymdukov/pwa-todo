@@ -6,13 +6,13 @@ import { makeStyles } from "@material-ui/core/styles";
 
 const LINK_OFFSET: number = 10;
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   listItem: {
-    width: "auto"
+    width: "auto",
   },
   listItemText: {
-    fontSize: "0.8rem"
-  }
+    fontSize: "0.8rem",
+  },
 }));
 
 export const DrawerListItem = ({
@@ -22,11 +22,12 @@ export const DrawerListItem = ({
   icon: Icon,
   onClick,
   sub,
-  highlighted = true
+  highlighted = true,
 }: IMenuLink) => {
   const classes = useStyles();
   const match = useRouteMatch({
-    path: to
+    path: to,
+    exact: true,
   });
 
   return (
@@ -50,7 +51,7 @@ export const DrawerListItem = ({
         </ListItemText>
       </ListItem>
       {sub &&
-        sub.map(route => (
+        sub.map((route) => (
           <DrawerListItem
             key={route.label}
             icon={route.icon}

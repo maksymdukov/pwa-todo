@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { Route, RouteComponentProps, Switch } from "react-router";
+import { TodosScopes } from "./todo-scopes";
 import TodosView from "pages/todos/components/todos-view";
 import SingleTodo from "pages/single-todo";
 import { useDispatch } from "react-redux";
@@ -25,15 +26,15 @@ const Todos = ({ match }: RouteComponentProps) => {
       <Route
         path={match.path}
         exact
-        render={(props) => <TodosView scope="all" {...props} />}
+        render={(props) => <TodosView scope={TodosScopes.all} {...props} />}
       />
       <Route
         path={match.path + "/my"}
-        render={(props) => <TodosView scope="my" {...props} />}
+        render={(props) => <TodosView scope={TodosScopes.my} {...props} />}
       />
       <Route
         path={match.path + "/shared"}
-        render={(props) => <TodosView scope="shared" {...props} />}
+        render={(props) => <TodosView scope={TodosScopes.shared} {...props} />}
       />
       <Route
         path={match.path + "/new"}

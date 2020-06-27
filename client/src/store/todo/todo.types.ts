@@ -7,6 +7,7 @@ export enum todoActionTypes {
   POST_TODO_RESET = "POST_TODO_RESET",
   LOAD_TODO = "LOAD_TODO",
   SET_ID = "SET_ID",
+  RESET_TODO = "RESET_TODO",
 }
 
 export interface PostTodoStart {
@@ -36,10 +37,15 @@ export interface SetTodoIdAction {
   payload: string;
 }
 
+export interface ResetTodoAction {
+  type: todoActionTypes.RESET_TODO;
+}
+
 export type TodoActions =
   | LoadTodoAction
   | SetTodoIdAction
   | PostTodoStart
   | PostTodoSuccess
   | PostTodoFail
-  | PostTodoReset;
+  | PostTodoReset
+  | ResetTodoAction;

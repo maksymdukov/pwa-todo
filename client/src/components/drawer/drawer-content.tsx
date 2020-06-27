@@ -77,7 +77,6 @@ export const DrawerContent = () => {
             ))}
           </List>
           <Divider />
-          <Link to="/todos/new">Create new TODO</Link>
         </>
       )}
       {!isAuth && (
