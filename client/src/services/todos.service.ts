@@ -51,6 +51,13 @@ export class TodosService extends Base {
       data: { lastTimeUpdated },
     });
   }
+  shareTodo(todoId: string, userId: string) {
+    return this.request({
+      url: `/${todoId}/share`,
+      method: "POST",
+      data: { userId },
+    });
+  }
 }
 
 export const todosService = new TodosService("/todos");

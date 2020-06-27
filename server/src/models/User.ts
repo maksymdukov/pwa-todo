@@ -1,11 +1,12 @@
 import bcrypt from 'bcrypt-nodejs';
-import mongoose, { Document } from 'mongoose';
+import mongoose, { Document, MongooseFilterQuery } from 'mongoose';
 import { ProfileDocument, profileSchema } from './Profile';
 import { WebSubscription } from '../interfaces/IWebSubscription';
+import { escapeRegExp } from '../util/regexp';
 
 export enum AuthProviders {
   facebook = 'facebookId',
-  google = 'googleId'
+  google = 'googleId',
 }
 
 export type UserDocument = mongoose.Document & {
@@ -30,7 +31,8 @@ export type UserModel = mongoose.Model<UserDocument> & {
 };
 
 type getUsersType = (
-  this: UserModel
+  this: UserModel,
+  attrs: { email?: string }
 ) => Promise<Pick<UserDocument, 'email' | 'profile' | 'id'>[]>;
 
 type findByExternalId = (
@@ -61,7 +63,7 @@ export interface AuthToken {
 
 export const userSchema = new mongoose.Schema(
   {
-    email: { type: String, unique: true },
+    email: { type: String, unique: true, text: true },
     password: String,
     passwordResetToken: String,
     passwordResetExpires: Date,
@@ -72,7 +74,7 @@ export const userSchema = new mongoose.Schema(
     webSubscriptions: [],
     refreshToken: String,
     refreshTokenExpiresAt: Date,
-    profile: profileSchema
+    profile: profileSchema,
   },
   { timestamps: true }
 );
@@ -80,9 +82,9 @@ export const userSchema = new mongoose.Schema(
 userSchema.set('toJSON', {
   virtuals: true,
   versionKey: false,
-  transform: function(doc, ret) {
+  transform: function (doc, ret) {
     delete ret._id;
-  }
+  },
 });
 
 /**
@@ -107,7 +109,7 @@ userSchema.pre('save', function save(next) {
   });
 });
 
-const comparePassword: comparePasswordFunction = function(
+const comparePassword: comparePasswordFunction = function (
   candidatePassword,
   cb
 ) {
@@ -120,11 +122,11 @@ const comparePassword: comparePasswordFunction = function(
   );
 };
 
-const findByExternalId: findByExternalId = async function(provider, id) {
+const findByExternalId: findByExternalId = async function (provider, id) {
   return this.findOne({ [provider]: id });
 };
 
-const createUser: createUser = async function(
+const createUser: createUser = async function (
   provider,
   { id, email, firstName, lastName, picture }
 ) {
@@ -140,13 +142,17 @@ const createUser: createUser = async function(
     profile: {
       firstName,
       lastName,
-      picture
-    }
+      picture,
+    },
   });
 };
 
-const getUsers: getUsersType = async function() {
-  return this.find({}, { id: 1, email: 1, profile: 1 });
+const getUsers: getUsersType = async function ({ email }) {
+  const query: MongooseFilterQuery<UserDocument> = {};
+  if (typeof email === 'string' && email !== '') {
+    query.email = new RegExp(`^${escapeRegExp(email)}`);
+  }
+  return this.find(query, { id: 1, email: 1 }, { limit: 10 });
 };
 
 userSchema.methods.comparePassword = comparePassword;
