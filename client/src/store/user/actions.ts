@@ -6,7 +6,7 @@ import { AppThunk } from "store/tools";
 import { UserProfile } from "./reducer";
 
 export const loginStart = (): UserActions => ({
-  type: userActionTypes.LOGIN_START
+  type: userActionTypes.LOGIN_START,
 });
 
 export const loginSuccess = ({
@@ -14,18 +14,18 @@ export const loginSuccess = ({
   email,
   firstName,
   lastName,
-  picture
+  picture,
 }: UserProfile): UserActions => ({
   type: userActionTypes.LOGIN_SUCCESS,
-  payload: { email, firstName, lastName, picture, id }
+  payload: { email, firstName, lastName, picture, id },
 });
 
 export const loginError = (): UserActions => ({
-  type: userActionTypes.LOGIN_ERROR
+  type: userActionTypes.LOGIN_ERROR,
 });
 
 const timeout = (timeout: number): Promise<void> =>
-  new Promise(resolve => {
+  new Promise((resolve) => {
     setTimeout(() => {
       resolve();
     }, timeout);
@@ -33,11 +33,11 @@ const timeout = (timeout: number): Promise<void> =>
 
 export const login = ({
   email,
-  password
+  password,
 }: {
   email: string;
   password: string;
-}): AppThunk<Promise<void>> => async dispatch => {
+}): AppThunk<Promise<void>> => async (dispatch) => {
   dispatch(loginStart());
   await timeout(1000);
   dispatch(
@@ -46,13 +46,13 @@ export const login = ({
       firstName: "Max",
       lastName: "Dukov",
       picture: "",
-      id: "someId"
+      id: "someId",
     })
   );
   return;
 };
 
-export const socialLogin = (authData: AuthData): AppThunk => dispatch => {
+export const socialLogin = (authData: AuthData): AppThunk => (dispatch) => {
   authPersistence.storeAuthData(authData);
   const { email, firstName, lastName, picture, sub: id } = jwtDecode(
     authData.accessToken
@@ -62,7 +62,8 @@ export const socialLogin = (authData: AuthData): AppThunk => dispatch => {
 
 export const logout = (): UserActions => {
   authPersistence.removeAuthData();
+  // TODO remove todos from indexedDB
   return {
-    type: userActionTypes.LOGOUT
+    type: userActionTypes.LOGOUT,
   };
 };

@@ -8,6 +8,8 @@ interface Storage {
   setItem: (key: string, obj: string) => void;
 }
 
+// TODO persist auth data in IndexedDB
+
 export class AuthPersistence {
   _storage: Storage;
   _authStorageKey: string;
