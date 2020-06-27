@@ -11,7 +11,7 @@ export type TodosStateType = {
 
 const initialState: TodosStateType = {
   items: [],
-  syncStatus: true,
+  syncStatus: false,
 };
 
 export const todosReducer = (

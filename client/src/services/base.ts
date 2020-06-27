@@ -1,13 +1,15 @@
-import axios, { Method, AxiosRequestConfig, AxiosResponse } from "axios";
+import { Method, AxiosRequestConfig, AxiosResponse } from "axios";
 import { authPersistence, AuthPersistence } from "services/auth-persistence";
 import { config } from "config/config";
 import { AuthData } from "pages/auth/signin/types";
+import { axios } from "libs/axios";
 
 interface RequestOptions {
   url?: string;
   method: Method;
   withAuth?: boolean;
   data?: any;
+  [key: string]: any;
 }
 
 export class Base {
@@ -25,14 +27,16 @@ export class Base {
     url,
     method,
     withAuth = true,
-    data
+    data,
+    ...other
   }: RequestOptions): Promise<AxiosResponse<T>> {
     const config: AxiosRequestConfig = {
       method,
       url,
       baseURL: this.baseUrl,
       data,
-      headers: { ...this._defaultHeaders }
+      headers: { ...this._defaultHeaders },
+      ...other,
     };
     if (withAuth) {
       let auth = this._authStorage.getAndValidateTokens();
@@ -64,7 +68,7 @@ export class Base {
         config.BASE_API_URL + "/auth/token",
         {
           refreshToken,
-          userId
+          userId,
         }
       );
       if (response.data.accessToken && response.data.refreshToken) {

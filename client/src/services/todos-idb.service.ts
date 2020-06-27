@@ -118,19 +118,27 @@ class TodosIDB {
   async syncOutboundRequests() {
     const requests = await this.getOutboundRequests();
     for (const request of requests) {
-      this.markRequestSyncing(request);
-      switch (request.type) {
-        case TodoRequestTypes.create:
-          await this.handleCreateTodoRequest(request);
-          break;
-        case TodoRequestTypes.edit:
-          await this.handleEditedTodoRequest(request);
-          break;
-        case TodoRequestTypes.delete:
-          await this.handleDeletedTodoRequest(request);
-          break;
-        default:
-          break;
+      if ((await this.getOutboundRequest(request.id))?.syncing) {
+        continue;
+      }
+      await this.markRequestSyncing(request);
+      try {
+        switch (request.type) {
+          case TodoRequestTypes.create:
+            await this.handleCreateTodoRequest(request);
+            break;
+          case TodoRequestTypes.edit:
+            await this.handleEditedTodoRequest(request);
+            break;
+          case TodoRequestTypes.delete:
+            await this.handleDeletedTodoRequest(request);
+            break;
+          default:
+            break;
+        }
+      } catch (e) {
+        await this.unmarkRequestSyncing(request);
+        throw e;
       }
     }
   }

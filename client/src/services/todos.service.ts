@@ -21,7 +21,12 @@ type TodoChangesResponse = {
 
 export class TodosService extends Base {
   createTodo(todo: Partial<ITodo>) {
-    return this.request<ITodo>({ url: "/todo", method: "POST", data: todo });
+    return this.request<ITodo>({
+      url: "/todo",
+      method: "POST",
+      data: todo,
+      timeout: 10000,
+    });
   }
   editTodo(todo: Partial<ITodo>) {
     return this.request<ITodo>({

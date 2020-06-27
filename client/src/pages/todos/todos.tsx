@@ -5,8 +5,10 @@ import SingleTodo from "pages/single-todo";
 import { useDispatch } from "react-redux";
 import { syncTodos, setTodoItems } from "store/todos/todos.actions";
 import { todosIDB } from "services/todos-idb.service";
+import { useConnectionStatus } from "hooks/use-connection-status";
 
 const Todos = ({ match }: RouteComponentProps) => {
+  useConnectionStatus();
   const dispatch = useDispatch();
   useEffect(() => {
     (async () => {
@@ -17,6 +19,7 @@ const Todos = ({ match }: RouteComponentProps) => {
       dispatch(syncTodos());
     })();
   }, [dispatch]);
+
   return (
     <Switch>
       <Route

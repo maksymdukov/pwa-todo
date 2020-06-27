@@ -10,13 +10,17 @@ import {
 } from "@material-ui/core";
 import MenuIcon from "@material-ui/icons/Menu";
 import CloudDoneOutlinedIcon from "@material-ui/icons/CloudDoneOutlined";
+import CloudOffOutlinedIcon from "@material-ui/icons/CloudOffOutlined";
 
 import { drawerWidth } from "components/layout/layout";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { getIsAuthenticated, getIsAuthenticating } from "store/user/selectors";
 import { Link, useHistory } from "react-router-dom";
 import { AccountMenu } from "./account-menu";
 import { getSyncState } from "store/todos/todos.selectors";
+import { syncTodos } from "store/todos/todos.actions";
+import { getConnetionStatus } from "store/tech/tech.selectors";
+import { ConnectionStatus } from "store/tech/tech.reducer";
 
 const useStyles = makeStyles((theme) => ({
   title: {
@@ -41,7 +45,13 @@ export const Navbar = ({ onDrawerOpen }) => {
   const syncing = useSelector(getSyncState);
   const isAuth = useSelector(getIsAuthenticated);
   const isAuthenticating = useSelector(getIsAuthenticating);
+  const status = useSelector(getConnetionStatus);
   const classes = useStyles();
+  const dispatch = useDispatch();
+
+  const doSync = () => {
+    dispatch(syncTodos());
+  };
   return (
     <AppBar position="fixed" className={classes.appBar}>
       <Toolbar>
@@ -75,8 +85,14 @@ export const Navbar = ({ onDrawerOpen }) => {
         )}
         {isAuth && (
           <>
-            {!syncing && <CloudDoneOutlinedIcon />}
-            {syncing && <CircularProgress color="inherit" size={20} />}
+            {status === ConnectionStatus.online ? (
+              <IconButton onClick={doSync} color="inherit" disabled={syncing}>
+                {!syncing && <CloudDoneOutlinedIcon />}
+                {syncing && <CircularProgress color="secondary" size={20} />}
+              </IconButton>
+            ) : (
+              <CloudOffOutlinedIcon color="inherit" />
+            )}
           </>
         )}
         {isAuth && <AccountMenu />}
