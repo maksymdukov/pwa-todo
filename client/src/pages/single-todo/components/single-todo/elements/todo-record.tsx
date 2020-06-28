@@ -8,11 +8,11 @@ import TextareaAutosize from "@material-ui/core/TextareaAutosize";
 const useStyles = makeStyles({
   label: {
     padding: "0 16px",
-    fontSize: "1.5rem"
+    fontSize: "1.5rem",
   },
   input: {
-    flexGrow: 1
-  }
+    flexGrow: 1,
+  },
 });
 
 interface TodoRecordProps {
@@ -22,6 +22,7 @@ interface TodoRecordProps {
   myRef: MutableRefObject<HTMLTextAreaElement | null>;
   onContentChange: (idx: number, value: string) => void;
   dragProps?: DraggableProvidedDragHandleProps;
+  editable: boolean;
 }
 
 const TodoRecord = ({
@@ -30,7 +31,8 @@ const TodoRecord = ({
   content,
   index,
   onContentChange,
-  dragProps
+  dragProps,
+  editable,
 }: TodoRecordProps) => {
   const classes = useStyles();
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -40,6 +42,7 @@ const TodoRecord = ({
     <Paper elevation={2}>
       <Box display="flex" alignItems="center" p={1}>
         <TextField
+          disabled={!editable}
           inputRef={(r: HTMLTextAreaElement) => {
             if (last) {
               myRef.current = r;
@@ -50,7 +53,7 @@ const TodoRecord = ({
           value={content}
           onChange={onChange}
         />
-        <IconButton disableTouchRipple {...dragProps}>
+        <IconButton disableTouchRipple {...dragProps} disabled={!editable}>
           <DragIndicatorIcon />
         </IconButton>
       </Box>

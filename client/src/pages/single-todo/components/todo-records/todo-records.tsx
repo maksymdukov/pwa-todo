@@ -20,9 +20,14 @@ type ContentChangeHandler = (idx: number, value: string) => void;
 type TodoRecordsProps = {
   todoRecords: ITodoRecord[];
   changeTodoRecords: (value: ITodoRecord[]) => void;
+  editable: boolean;
 };
 
-const TodoRecords = ({ todoRecords, changeTodoRecords }: TodoRecordsProps) => {
+const TodoRecords = ({
+  todoRecords,
+  changeTodoRecords,
+  editable,
+}: TodoRecordsProps) => {
   const lastItemRef = useRef<HTMLTextAreaElement>(null);
   const prevTodos = usePrevious(todoRecords);
 
@@ -109,6 +114,7 @@ const TodoRecords = ({ todoRecords, changeTodoRecords }: TodoRecordsProps) => {
                         last={index === todoRecords.length - 1}
                         onContentChange={onContentChange}
                         dragProps={provided.dragHandleProps}
+                        editable={editable}
                       />
                     </article>
                   )}
@@ -119,7 +125,7 @@ const TodoRecords = ({ todoRecords, changeTodoRecords }: TodoRecordsProps) => {
           )}
         </Droppable>
       </DragDropContext>
-      <NewRecord onAddNewChange={onAddNewChange} />
+      {editable && <NewRecord onAddNewChange={onAddNewChange} />}
     </>
   );
 };

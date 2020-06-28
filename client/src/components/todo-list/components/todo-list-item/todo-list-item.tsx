@@ -13,6 +13,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import { Link } from "react-router-dom";
 import TodoMenu from "../todo-menu/todo-menu";
 import { ITodoListItem } from "models/ITodoListItem";
+import { UserState } from "store/user/reducer";
 
 const useStyles = makeStyles((theme) => ({
   item: {
@@ -35,11 +36,13 @@ const useStyles = makeStyles((theme) => ({
 
 interface TodoListItemProps {
   todo: ITodoListItem;
+  userState: UserState;
 }
 
 const TodoListItem = (props: TodoListItemProps) => {
   const {
     todo: { title, creator, id, updatedAt, pending },
+    userState,
   } = props;
   const classes = useStyles();
 
@@ -65,16 +68,18 @@ const TodoListItem = (props: TodoListItemProps) => {
           {pending && <div style={{ color: "red" }}>pending</div>}
         </div>
       </ListItemText>
-      <ListItemSecondaryAction>
-        <IconButton onClick={openMenu}>
-          <MoreVertIcon />
-        </IconButton>
-        <TodoMenu
-          anchorEl={anchorEl}
-          handleClose={closeMenu}
-          todo={props.todo}
-        />
-      </ListItemSecondaryAction>
+      {creator.id === userState.id && (
+        <ListItemSecondaryAction>
+          <IconButton onClick={openMenu}>
+            <MoreVertIcon />
+          </IconButton>
+          <TodoMenu
+            anchorEl={anchorEl}
+            handleClose={closeMenu}
+            todo={props.todo}
+          />
+        </ListItemSecondaryAction>
+      )}
     </ListItem>
   );
 };

@@ -7,12 +7,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { getTodoItemState } from "store/todo/todo.selectors";
 import SaveTodoBtn from "./elements/save-todo-btn";
 import { ITodo, ITodoRecord } from "models/ITodo";
-import {
-  postTodo,
-  setSingleTodo,
-  resetTodo,
-} from "../../../../store/todo/todo.actions";
+import { postTodo, setSingleTodo, resetTodo } from "store/todo/todo.actions";
 import { getSyncState } from "store/todos/todos.selectors";
+import { getUserState } from "store/user/selectors";
 
 type SingleTodoProps = RouteComponentProps<{ id?: string }> & {
   isNew?: boolean;
@@ -24,6 +21,9 @@ const SingleTodo = ({ match, isNew }: SingleTodoProps) => {
   const syncing = useSelector(getSyncState);
   const dispatch = useDispatch();
   const [todo, setTodo] = useState<ITodo>(todoToEdit);
+  const userProfile = useSelector(getUserState);
+
+  const isEditable = isNew || userProfile.id === todo.creator.id;
 
   useEffect(() => {
     return () => {
@@ -74,12 +74,13 @@ const SingleTodo = ({ match, isNew }: SingleTodoProps) => {
   return (
     <div className={classes.container}>
       {isNew && "Create new todo"}
-      <TodoHeader setTodo={setTodo} todo={todo} />
+      <TodoHeader setTodo={setTodo} todo={todo} editable={isEditable} />
       <TodoRecords
+        editable={isEditable}
         todoRecords={todo.records}
         changeTodoRecords={changeTodoRecords}
       />
-      <SaveTodoBtn onClick={onSaveClick} />
+      {isEditable && <SaveTodoBtn onClick={onSaveClick} />}
     </div>
   );
 };

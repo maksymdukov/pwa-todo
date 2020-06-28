@@ -9,7 +9,7 @@ export type UserProfile = Readonly<{
   picture: string;
 }>;
 
-type UserState = Readonly<{
+export type UserState = Readonly<{
   isAuthenticated: boolean;
   isAuthenticating: boolean;
 }> &
@@ -24,7 +24,7 @@ const initState: UserState = {
   email: decoded?.email || "",
   firstName: decoded?.firstName || "",
   lastName: decoded?.lastName || "",
-  picture: decoded?.picture || ""
+  picture: decoded?.picture || "",
 };
 
 export const userReducer = (
@@ -42,7 +42,7 @@ export const userReducer = (
         email: action.payload.email,
         firstName: action.payload.firstName,
         lastName: action.payload.lastName,
-        picture: action.payload.picture
+        picture: action.payload.picture,
       };
     case userActionTypes.LOGOUT:
       return {
@@ -52,7 +52,7 @@ export const userReducer = (
         email: "",
         firstName: "",
         lastName: "",
-        picture: ""
+        picture: "",
       };
     default:
       return state;

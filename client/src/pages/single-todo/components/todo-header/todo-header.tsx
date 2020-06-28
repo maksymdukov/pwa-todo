@@ -5,9 +5,10 @@ import { ITodo } from "models/ITodo";
 type TodoHeaderProps = {
   todo: ITodo;
   setTodo: (value: SetStateAction<ITodo>) => void;
+  editable: boolean;
 };
 
-const TodoHeader = ({ todo, setTodo }: TodoHeaderProps) => {
+const TodoHeader = ({ todo, setTodo, editable }: TodoHeaderProps) => {
   return (
     <Box
       display="flex"
@@ -17,6 +18,7 @@ const TodoHeader = ({ todo, setTodo }: TodoHeaderProps) => {
       mb={2}
     >
       <TextField
+        disabled={!editable}
         label="Title"
         variant="outlined"
         value={todo.title}
