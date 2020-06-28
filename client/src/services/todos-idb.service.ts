@@ -33,12 +33,18 @@ class TodosIDB {
     const tx = (await this.db.db).transaction(DBNames.syncTodos, "readwrite");
 
     const promises = items.map((item) => {
-      if (item.reason === TodoHistoryReason.deleted) {
+      //  handle delete and unshare case
+      if (
+        item.reason === TodoHistoryReason.deleted ||
+        (item.reason === TodoHistoryReason.unshared &&
+          item.userId !== item.todo.creator.id)
+      ) {
         return tx.store.delete(item.todo.id);
       }
       return tx.store.put(item.todo);
     });
 
+    // TODO Use chain of promises instead of Promise.all
     // @ts-ignore
     await Promise.all(promises);
     await tx.done;

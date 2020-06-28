@@ -142,7 +142,12 @@ export const shareTodo = async (req: Request, res: Response) => {
     reason: TodoHistoryReason.shared,
   });
 
-  // TODO add history record for shared person
+  // add history record for shared person
+  await TodoHistory.build({
+    userId: userId,
+    todo: populatedTodo,
+    reason: TodoHistoryReason.shared,
+  });
 
   // Webpush
   const userSub = await User.findById(userId);
@@ -181,7 +186,11 @@ export const revokeTodoShare = async (req: Request, res: Response) => {
     reason: TodoHistoryReason.unshared,
   });
 
-  // TODO add history record for shared person
+  await TodoHistory.build({
+    userId: userId,
+    todo: populatedTodo,
+    reason: TodoHistoryReason.unshared,
+  });
 
   res.end();
 };

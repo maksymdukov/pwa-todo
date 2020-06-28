@@ -28,7 +28,6 @@ interface ShareDialogProps {
 const useStyles = makeStyles({
   listItem: {
     "&:hover": {
-      // backgroundColor: "rgba(0,0,0,0.5)",
       "& $removeIcon": {
         visibility: "visible",
       },
@@ -77,18 +76,6 @@ const ShareDialog = ({ closeDialog, dialogOpened, todo }: ShareDialogProps) => {
         ))}
         <ListSubheader>Share:</ListSubheader>
         <UserAutocomplete todo={todo} onSharedSuccess={onSuccessfulShare} />
-        {/* <ListItem
-          autoFocus
-          button
-          onClick={() => handleListItemClick("addAccount")}
-        >
-          <ListItemAvatar>
-            <Avatar>
-              <AddIcon />
-            </Avatar>
-          </ListItemAvatar>
-          <ListItemText primary="Add account" />
-        </ListItem> */}
       </List>
     </Dialog>
   );
