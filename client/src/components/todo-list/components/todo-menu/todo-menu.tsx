@@ -4,14 +4,21 @@ import { ITodoListItem } from "models/ITodoListItem";
 import { useDispatch } from "react-redux";
 import { deleteTodoAction } from "store/todo/todo.actions";
 import ShareDialog from "../share-dialog/share-dialog";
+import { ConnectionStatus } from "store/tech/tech.reducer";
 
 interface TodoMenuProps {
   anchorEl: null | HTMLElement;
   handleClose: () => void;
   todo: ITodoListItem;
+  connetionStatus: ConnectionStatus;
 }
 
-const TodoMenu = ({ anchorEl, handleClose, todo }: TodoMenuProps) => {
+const TodoMenu = ({
+  anchorEl,
+  handleClose,
+  todo,
+  connetionStatus,
+}: TodoMenuProps) => {
   const dispatch = useDispatch();
 
   const wrapInMenuClose = (fn: Function) => () => {
@@ -38,8 +45,13 @@ const TodoMenu = ({ anchorEl, handleClose, todo }: TodoMenuProps) => {
   return (
     <>
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
+        <MenuItem
+          onClick={handleShareClick}
+          disabled={connetionStatus === ConnectionStatus.offline}
+        >
+          Share
+        </MenuItem>
         <MenuItem onClick={handleDeleteClick}>Delete</MenuItem>
-        <MenuItem onClick={handleShareClick}>Share</MenuItem>
       </Menu>
       <ShareDialog
         dialogOpened={dialogOpened}

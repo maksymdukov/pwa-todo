@@ -14,6 +14,7 @@ import { Link } from "react-router-dom";
 import TodoMenu from "../todo-menu/todo-menu";
 import { ITodoListItem } from "models/ITodoListItem";
 import { UserState } from "store/user/reducer";
+import { ConnectionStatus } from "store/tech/tech.reducer";
 
 const useStyles = makeStyles((theme) => ({
   item: {
@@ -37,12 +38,14 @@ const useStyles = makeStyles((theme) => ({
 interface TodoListItemProps {
   todo: ITodoListItem;
   userState: UserState;
+  connetionStatus: ConnectionStatus;
 }
 
 const TodoListItem = (props: TodoListItemProps) => {
   const {
     todo: { title, creator, id, updatedAt, pending },
     userState,
+    connetionStatus,
   } = props;
   const classes = useStyles();
 
@@ -77,6 +80,7 @@ const TodoListItem = (props: TodoListItemProps) => {
             anchorEl={anchorEl}
             handleClose={closeMenu}
             todo={props.todo}
+            connetionStatus={connetionStatus}
           />
         </ListItemSecondaryAction>
       )}
