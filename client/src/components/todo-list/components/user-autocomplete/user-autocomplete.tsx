@@ -2,13 +2,15 @@ import React, { useState } from "react";
 import TextField from "@material-ui/core/TextField";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import CircularProgress from "@material-ui/core/CircularProgress";
-import { UserType, usersService } from "services/users.service";
+import { usersService } from "services/users.service";
 import axios from "axios";
 import throttle from "lodash/throttle";
 import PersonAddOutlinedIcon from "@material-ui/icons/PersonAddOutlined";
 import { IconButton, Box, makeStyles } from "@material-ui/core";
-import { ITodo } from "models/ITodo";
+import { ITodo, ISharedUser } from "models/ITodo";
 import { todosService } from "services/todos.service";
+import { syncTodos } from "store/todos/todos.actions";
+import { useDispatch } from "react-redux";
 
 const useStyles = makeStyles(({}) => ({
   shareBtn: {
@@ -18,14 +20,19 @@ const useStyles = makeStyles(({}) => ({
 
 interface UserAutocompleteProps {
   todo: ITodo;
+  onSharedSuccess?: (usr: ISharedUser) => void;
 }
 
-export const UserAutocomplete = ({ todo }: UserAutocompleteProps) => {
+export const UserAutocomplete = ({
+  todo,
+  onSharedSuccess,
+}: UserAutocompleteProps) => {
   const classes = useStyles();
-  const [value, setValue] = React.useState<UserType | null>(null);
+  const dispatch = useDispatch();
+  const [value, setValue] = React.useState<ISharedUser | null>(null);
   const [open, setOpen] = useState(false);
   const [inputValue, setInputValue] = useState("");
-  const [options, setOptions] = useState<UserType[]>([]);
+  const [options, setOptions] = useState<ISharedUser[]>([]);
   const [loading, setLoading] = useState(false);
 
   console.log("value", value);
@@ -70,9 +77,13 @@ export const UserAutocomplete = ({ todo }: UserAutocompleteProps) => {
     }
   }, [open]);
 
-  const onShareClick = () => {
-    todosService.shareTodo(todo.id, value!.id);
-    // TODO sync changes somehow
+  const onShareClick = async () => {
+    await todosService.shareTodo(todo.id, value!.id);
+    onSharedSuccess && onSharedSuccess(value!);
+    setOptions([]);
+    setValue(null);
+    setInputValue("");
+    dispatch(syncTodos());
   };
 
   return (
@@ -83,7 +94,7 @@ export const UserAutocomplete = ({ todo }: UserAutocompleteProps) => {
         open={open}
         inputValue={inputValue}
         value={value}
-        onChange={(event: any, newValue: UserType | null) => {
+        onChange={(event: any, newValue: ISharedUser | null) => {
           setValue(newValue);
         }}
         onInputChange={(event, newInputValue) => {

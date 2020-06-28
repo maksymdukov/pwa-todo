@@ -1,5 +1,5 @@
 import { Base } from "./base";
-import { ITodo } from "../models/ITodo";
+import { ITodo, ISharedUser } from "../models/ITodo";
 import { TodoHistoryChange } from "../models/ITodoHistoryChange";
 
 interface AllTodosResponse {
@@ -54,6 +54,13 @@ export class TodosService extends Base {
   shareTodo(todoId: string, userId: string) {
     return this.request({
       url: `/${todoId}/share`,
+      method: "POST",
+      data: { userId },
+    });
+  }
+  unshareTodo(todoId: string, userId: string) {
+    return this.request({
+      url: `/${todoId}/unshare`,
       method: "POST",
       data: { userId },
     });

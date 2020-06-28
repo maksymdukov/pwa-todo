@@ -1,12 +1,8 @@
 import { Base } from "./base";
 import { CancelToken } from "axios";
+import { ISharedUser } from "models/ITodo";
 
-export interface UserType {
-  email: string;
-  id: string;
-}
-
-export type GetUserResponse = UserType[];
+export type GetUserResponse = ISharedUser[];
 
 export class UsersService extends Base {
   async getUsers(email: string, cancelToken: CancelToken) {

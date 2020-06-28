@@ -152,7 +152,17 @@ const getUsers: getUsersType = async function ({ email }) {
   if (typeof email === 'string' && email !== '') {
     query.email = new RegExp(`^${escapeRegExp(email)}`);
   }
-  return this.find(query, { id: 1, email: 1 }, { limit: 10 });
+  return this.find(
+    query,
+    {
+      id: 1,
+      email: 1,
+      'profile.firtName': 1,
+      'profile.lastName': 1,
+      'profile.picture': 1,
+    },
+    { limit: 10 }
+  );
 };
 
 userSchema.methods.comparePassword = comparePassword;

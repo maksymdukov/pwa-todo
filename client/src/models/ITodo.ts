@@ -1,11 +1,13 @@
+export interface ISharedUser {
+  id: string;
+  email: string;
+  profile: { firstName: string; lastName: string; picture: string };
+}
+
 export interface ITodo {
   id: string;
   title: string;
-  shared: {
-    id: string;
-    email: string;
-    profile: { firstName: string; lastName: string; picture: string };
-  }[];
+  shared: ISharedUser[];
   creator: {
     id: string;
     email: string;
