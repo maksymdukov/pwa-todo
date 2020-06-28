@@ -3,7 +3,7 @@ import { TodoHistoryReason } from "./TodoHistoryReason";
 
 export interface TodoHistoryChange {
   id: string;
-  userId: string;
+  userId: string[];
   todo: ITodo;
   reason: TodoHistoryReason;
   createdAt: string;

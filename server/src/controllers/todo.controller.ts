@@ -53,7 +53,7 @@ export const postTodo = async (req: Request, res: Response) => {
 
   // Save history record;
   const historyRecord = await TodoHistory.build({
-    userId: user.id,
+    userIds: [user.id],
     todo: newTodo,
     reason: TodoHistoryReason.created,
   });
@@ -84,7 +84,7 @@ export const editTodo = async (req: Request, res: Response) => {
 
   // Savee history record
   const historyRecord = await TodoHistory.build({
-    userId: req.user.id,
+    userIds: [req.user.id],
     todo: savedTodo,
     reason: TodoHistoryReason.updated,
   });
@@ -104,7 +104,7 @@ export const deleteTodo = async (req: Request, res: Response) => {
 
   // Save history record
   const historyRecord = await TodoHistory.build({
-    userId: req.user.id,
+    userIds: [req.user.id],
     todo: todo,
     reason: TodoHistoryReason.deleted,
   });
@@ -137,14 +137,7 @@ export const shareTodo = async (req: Request, res: Response) => {
 
   // Savee history record
   const historyRecord = await TodoHistory.build({
-    userId: user.id,
-    todo: populatedTodo,
-    reason: TodoHistoryReason.shared,
-  });
-
-  // add history record for shared person
-  await TodoHistory.build({
-    userId: userId,
+    userIds: [user.id],
     todo: populatedTodo,
     reason: TodoHistoryReason.shared,
   });
@@ -181,13 +174,7 @@ export const revokeTodoShare = async (req: Request, res: Response) => {
 
   // Savee history record
   const historyRecord = await TodoHistory.build({
-    userId: user.id,
-    todo: populatedTodo,
-    reason: TodoHistoryReason.unshared,
-  });
-
-  await TodoHistory.build({
-    userId: userId,
+    userIds: [user.id, userId],
     todo: populatedTodo,
     reason: TodoHistoryReason.unshared,
   });

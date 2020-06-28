@@ -1,15 +1,16 @@
 import mongoose from 'mongoose';
 import { TodoHistoryReason } from './TodoHistoryReason';
 import { TodoDocument, todoSchema } from './Todo';
+import { UserDocument } from './User';
 
 export interface TodoHistoryDocument extends mongoose.Document {
-  userId: string;
+  userId: string[];
   todo: mongoose.Types.ObjectId | TodoDocument;
   reason: TodoHistoryReason;
 }
 
 export interface TodoHistoryAttrs {
-  userId: string;
+  userIds: string[];
   todo: TodoDocument;
   reason: TodoHistoryReason;
 }
@@ -20,10 +21,12 @@ export interface TodoHistoryModel extends mongoose.Model<TodoHistoryDocument> {
 
 export const todoHistorySchema = new mongoose.Schema(
   {
-    userId: {
-      type: String,
-      required: true,
-    },
+    userId: [
+      {
+        type: String,
+        required: true,
+      },
+    ],
     todo: {
       type: Object,
       required: true,
@@ -47,8 +50,11 @@ export const todoHistorySchema = new mongoose.Schema(
 );
 
 const build: TodoHistoryModel['build'] = async function (attrs) {
+  const sharedUsers = (attrs.todo.shared as UserDocument[]).map(
+    (usr) => usr.id
+  );
   const history = new TodoHistory({
-    userId: attrs.userId,
+    userId: sharedUsers.concat(attrs.userIds),
     todo: attrs.todo.toJSON(),
     reason: attrs.reason,
   });

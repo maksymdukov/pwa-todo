@@ -6,6 +6,8 @@ import { TodoHistoryChange } from "models/ITodoHistoryChange";
 import { TodoHistoryReason } from "models/TodoHistoryReason";
 import { TodoRequest, TodoRequestTypes } from "models/ITodoRequest";
 import { TodosService, todosService } from "./todos.service";
+import { store } from "store/store";
+import { getUserState } from "store/user/selectors";
 
 class TodosIDB {
   constructor(public db: IDB, public todosService: TodosService) {}
@@ -30,14 +32,21 @@ class TodosIDB {
   }
 
   async updateTodos(items: TodoHistoryChange[], timestamp: number) {
+    // TODO workaround. Inject userIDB instead
+    const userProfile = getUserState(store.getState());
+    // workaround end
+
     const tx = (await this.db.db).transaction(DBNames.syncTodos, "readwrite");
 
     const promises = items.map((item) => {
       //  handle delete and unshare case
       if (
+        // Deleted
         item.reason === TodoHistoryReason.deleted ||
+        // Todo is unshared and I'm not in the shared list anymore and I'm not an owner of todo
         (item.reason === TodoHistoryReason.unshared &&
-          item.userId !== item.todo.creator.id)
+          item.todo.creator.id !== userProfile.id &&
+          !item.todo.shared.find((share) => share.id === userProfile.id))
       ) {
         return tx.store.delete(item.todo.id);
       }
