@@ -5,7 +5,12 @@ import { getUserState } from "store/user/selectors";
 import { history } from "providers";
 import { getTodoItems } from "store/todos/todos.selectors";
 import { todosIDB } from "services/todos-idb.service";
-import { setTodoItems, syncTodos } from "store/todos/todos.actions";
+import {
+  setTodoItems,
+  syncTodos,
+  syncOutboundRequests,
+  updateTodosFromIDB,
+} from "store/todos/todos.actions";
 
 export const postTodoStart = (): TodoActions => ({
   type: todoActionTypes.POST_TODO_START,
@@ -36,7 +41,6 @@ export const postTodo = ({
   isNew: boolean;
 }): AppThunk => async (dispatch, getState) => {
   try {
-    dispatch(postTodoStart());
     const timestamp = Date.now();
     if (isNew) {
       const userState = getUserState(getState());
@@ -78,17 +82,12 @@ export const postTodo = ({
       await todosIDB.editTodo(editedTodo);
     }
 
-    dispatch(postTodoSuccess());
-    const dbTodos = await todosIDB.getAllTodos();
-    // save to redux
-    dispatch(setTodoItems({ items: dbTodos }));
+    await dispatch(updateTodosFromIDB());
     history.push("/todos");
 
-    // Launch sync process
-    dispatch(syncTodos());
+    await dispatch(syncOutboundRequests());
   } catch (e) {
     console.log(e);
-    dispatch(postTodoFail(e));
   }
 };
 
@@ -122,10 +121,8 @@ export const deleteTodoAction = (todoId: string): AppThunk => async (
   dispatch
 ) => {
   await todosIDB.deleteTodo(todoId, Date.now());
-  // get all todos from db
-  const dbTodos = await todosIDB.getAllTodos();
-  // refresh redux todos
-  dispatch(setTodoItems({ items: dbTodos }));
-  // start syncing
-  dispatch(syncTodos());
+  await dispatch(updateTodosFromIDB());
+  // // start syncing
+  // dispatch(syncTodos());
+  await dispatch(syncOutboundRequests());
 };

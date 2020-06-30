@@ -130,12 +130,39 @@ class TodosIDB {
     await this.addOutboundRequest(request);
   }
 
+  async setIsOutboundSyncing() {
+    return this.db.keyval.set(KeyValKeys.isOutboundSyncing, "true");
+  }
+  async unsetIsOutboundSyncing() {
+    return this.db.keyval.set(KeyValKeys.isOutboundSyncing, "false");
+  }
+
+  async getIsOutboundSyncing() {
+    return (await this.db.keyval.get(KeyValKeys.isOutboundSyncing)) === "true";
+  }
+
   async syncOutboundRequests() {
+    if (await this.getIsOutboundSyncing()) {
+      return;
+    }
+    await this.setIsOutboundSyncing();
     const requests = await this.getOutboundRequests();
+    if (!requests.length) {
+      await this.unsetIsOutboundSyncing();
+      return;
+    }
     for (const request of requests) {
-      if ((await this.getOutboundRequest(request.id))?.syncing) {
+      // The follwing block is needed to mitigate possible concurrency issues
+      // when trying to syncOutboundRequests multiple times
+      const currentRequestState = await this.getOutboundRequest(request.id);
+      if (
+        request.syncing ||
+        !currentRequestState ||
+        currentRequestState.syncing
+      ) {
         continue;
       }
+
       await this.markRequestSyncing(request);
       try {
         switch (request.type) {
@@ -153,9 +180,15 @@ class TodosIDB {
         }
       } catch (e) {
         await this.unmarkRequestSyncing(request);
+        await this.unsetIsOutboundSyncing();
         throw e;
       }
     }
+    await this.unsetIsOutboundSyncing();
+
+    // Try to dispatch outbound requests again
+    // in case when we were processing outbound queue new requests appeared
+    await this.syncOutboundRequests();
   }
 
   async markRequestSyncing(request: TodoRequest) {

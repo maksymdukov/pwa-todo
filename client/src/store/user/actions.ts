@@ -4,6 +4,7 @@ import jwtDecode from "jwt-decode";
 import { AuthData } from "pages/auth/signin/types";
 import { AppThunk } from "store/tools";
 import { UserProfile } from "./reducer";
+import { idb } from "services/idb.service";
 
 export const loginStart = (): UserActions => ({
   type: userActionTypes.LOGIN_START,
@@ -22,6 +23,10 @@ export const loginSuccess = ({
 
 export const loginError = (): UserActions => ({
   type: userActionTypes.LOGIN_ERROR,
+});
+
+export const logoutAction = (): UserActions => ({
+  type: userActionTypes.LOGOUT,
 });
 
 const timeout = (timeout: number): Promise<void> =>
@@ -54,16 +59,17 @@ export const login = ({
 
 export const socialLogin = (authData: AuthData): AppThunk => (dispatch) => {
   authPersistence.storeAuthData(authData);
+  console.log("jwtDecode", jwtDecode(authData.accessToken));
+
   const { email, firstName, lastName, picture, sub: id } = jwtDecode(
     authData.accessToken
   );
   dispatch(loginSuccess({ email, firstName, lastName, picture, id }));
 };
 
-export const logout = (): UserActions => {
-  authPersistence.removeAuthData();
+export const logout = (): AppThunk => async (dispatch) => {
+  dispatch(logoutAction());
+  await authPersistence.removeAuthData();
+  await idb.clearAllDBs();
   // TODO remove todos from indexedDB
-  return {
-    type: userActionTypes.LOGOUT,
-  };
 };

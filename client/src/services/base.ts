@@ -1,8 +1,9 @@
-import { Method, AxiosRequestConfig, AxiosResponse } from "axios";
+import { Method, AxiosRequestConfig, AxiosResponse, AxiosError } from "axios";
 import { authPersistence, AuthPersistence } from "services/auth-persistence";
 import { config } from "config/config";
 import { AuthData } from "pages/auth/signin/types";
 import { axios } from "libs/axios";
+import { InvalidRefreshToken } from "errors/invalid-refresh-token";
 
 interface RequestOptions {
   url?: string;
@@ -47,10 +48,7 @@ export class Base {
       }
       let accessToken = auth.accessToken;
       if (auth.accessTokenExpired) {
-        const authObject = await this.refreshToken(auth.refreshToken);
-        if (!authObject) {
-          return Promise.reject();
-        }
+        const authObject = await this.refreshToken();
         accessToken = authObject.accessToken;
       }
 
@@ -60,8 +58,9 @@ export class Base {
     return axios(config);
   }
 
-  async refreshToken(refreshToken: string): Promise<AuthData | null> {
+  async refreshToken(): Promise<AuthData> {
     try {
+      let { refreshToken } = this._authStorage.getAndValidateTokens();
       const decoded = this._authStorage.getDecodedAccessToken();
       const userId = decoded!.sub;
       const response = await axios.post<AuthData>(
@@ -71,15 +70,14 @@ export class Base {
           userId,
         }
       );
-      if (response.data.accessToken && response.data.refreshToken) {
-        this._authStorage.storeAuthData(response.data);
-        return response.data;
-      } else {
-        return null;
-      }
+      this._authStorage.storeAuthData(response.data);
+      return response.data;
     } catch (e) {
       console.log("Error refreshing token");
-      return null;
+      if (e.response?.status === 401) {
+        throw new InvalidRefreshToken();
+      }
+      throw e;
     }
   }
 }

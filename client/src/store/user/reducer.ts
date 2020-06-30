@@ -43,6 +43,7 @@ export const userReducer = (
         firstName: action.payload.firstName,
         lastName: action.payload.lastName,
         picture: action.payload.picture,
+        id: action.payload.id,
       };
     case userActionTypes.LOGOUT:
       return {

@@ -115,6 +115,12 @@ export class IDB {
       return tx.done;
     });
   }
+
+  async clearAllDBs() {
+    await this.clearAllData(DBNames.syncTodos);
+    await this.clearAllData(DBNames.outboundTodos);
+    await this.clearAllData(DBNames.keyval);
+  }
 }
 
 class KeyValStore {

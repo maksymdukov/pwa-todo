@@ -3,24 +3,26 @@ import { Route, RouteComponentProps, Switch } from "react-router";
 import { TodosScopes } from "./todo-scopes";
 import TodosView from "pages/todos/components/todos-view";
 import SingleTodo from "pages/single-todo";
-import { useDispatch } from "react-redux";
-import { syncTodos, setTodoItems } from "store/todos/todos.actions";
-import { todosIDB } from "services/todos-idb.service";
 import { useConnectionStatus } from "hooks/use-connection-status";
+import { useSocketIO } from "hooks/use-socketio";
+import { useInitTodos } from "hooks/use-init-todos";
 
 const Todos = ({ match }: RouteComponentProps) => {
   useConnectionStatus();
-  const dispatch = useDispatch();
+  const { initializeTodos } = useInitTodos();
+  const { initSocket, socketRef } = useSocketIO();
   useEffect(() => {
     (async () => {
-      // Get todos from db
-      const dbTodos = await todosIDB.getAllTodos();
-      dispatch(setTodoItems({ items: dbTodos }));
-      // Then try syncing on mount
-      dispatch(syncTodos());
+      await initializeTodos();
+      await initSocket();
     })();
-  }, [dispatch]);
+    return () => {
+      console.log("Todos INIT useEffect return, before closing");
 
+      // eslint-disable-next-line
+      socketRef.current?.close();
+    };
+  }, [initializeTodos, initSocket, socketRef]);
   return (
     <Switch>
       <Route

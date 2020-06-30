@@ -6,6 +6,8 @@ import {
   ListItemSecondaryAction,
   ListItemText,
   Typography,
+  Avatar,
+  Box,
 } from "@material-ui/core";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import UserAvatar from "components/user-avatar/user-avatar";
@@ -33,6 +35,19 @@ const useStyles = makeStyles((theme) => ({
     flexGrow: 1,
   },
   itemActions: {},
+  sharedContainer: {
+    "& > :not(:first-child)": {
+      marginLeft: -10,
+    },
+    opacity: 0.8
+  },
+  sharedAvatar: {
+    width: "1em",
+    height: "1em",
+  },
+  fallbackSharedAvatar: {
+    color: theme.palette.grey[500],
+  },
 }));
 
 interface TodoListItemProps {
@@ -43,7 +58,7 @@ interface TodoListItemProps {
 
 const TodoListItem = (props: TodoListItemProps) => {
   const {
-    todo: { title, creator, id, updatedAt, pending },
+    todo: { title, creator, id, updatedAt, pending, shared },
     userState,
     connetionStatus,
   } = props;
@@ -57,6 +72,8 @@ const TodoListItem = (props: TodoListItemProps) => {
     setAnchorEl(null);
   };
 
+  const isMyTodo = creator.id === userState.id;
+
   return (
     <ListItem className={classes.item} to={`/todos/${id}`} component={Link}>
       <ListItemAvatar>
@@ -68,10 +85,26 @@ const TodoListItem = (props: TodoListItemProps) => {
             Updated: {new Date(updatedAt).toLocaleString()}
           </Typography>
           <div>{title}</div>
+          {isMyTodo && (
+            <Box
+              display="flex"
+              alignItems="center"
+              className={classes.sharedContainer}
+            >
+              {shared.map((sharedUser) => (
+                <UserAvatar
+                  key={sharedUser.id}
+                  src={sharedUser.profile.picture}
+                  className={classes.sharedAvatar}
+                  fallbackClassname={classes.fallbackSharedAvatar}
+                />
+              ))}
+            </Box>
+          )}
           {pending && <div style={{ color: "red" }}>pending</div>}
         </div>
       </ListItemText>
-      {creator.id === userState.id && (
+      {isMyTodo && (
         <ListItemSecondaryAction>
           <IconButton onClick={openMenu}>
             <MoreVertIcon />

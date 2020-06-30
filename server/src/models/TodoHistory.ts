@@ -2,6 +2,8 @@ import mongoose from 'mongoose';
 import { TodoHistoryReason } from './TodoHistoryReason';
 import { TodoDocument, todoSchema } from './Todo';
 import { UserDocument } from './User';
+import { io } from '../server';
+import { SocketEvents } from '../config/socketio';
 
 export interface TodoHistoryDocument extends mongoose.Document {
   userId: string[];
@@ -50,15 +52,25 @@ export const todoHistorySchema = new mongoose.Schema(
 );
 
 const build: TodoHistoryModel['build'] = async function (attrs) {
-  const sharedUsers = (attrs.todo.shared as UserDocument[]).map(
-    (usr) => usr.id
-  );
+  const relatedUsers = (attrs.todo.shared as UserDocument[])
+    .map((usr) => usr.id)
+    .concat(attrs.userIds);
+
   const history = new TodoHistory({
-    userId: sharedUsers.concat(attrs.userIds),
+    userId: relatedUsers,
     todo: attrs.todo.toJSON(),
     reason: attrs.reason,
   });
-  return history.save();
+  const savedHistory = await history.save();
+
+  // Send messages via SocketIO
+  relatedUsers.forEach((usrId) => {
+    io.to(usrId).emit(
+      SocketEvents.newTodoChanges,
+      JSON.stringify(savedHistory)
+    );
+  });
+  return savedHistory;
 };
 
 todoHistorySchema.statics.build = build;

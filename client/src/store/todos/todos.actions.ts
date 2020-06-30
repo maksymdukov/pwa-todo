@@ -3,12 +3,15 @@ import { AppThunk } from "store/tools";
 import { todosService } from "../../services/todos.service";
 import { TodosActions, todosActionTypes } from "./todos.types";
 import { getTodoItems, getSyncState } from "./todos.selectors";
-import { idb, DBNames } from "services/idb.service";
+import { idb } from "services/idb.service";
 import { KeyValKeys } from "models/KeyValStore";
 import { todosIDB } from "services/todos-idb.service";
-import { checkConnection, setStatusOffline } from "store/tech/tech.actions";
+import { setStatusOffline } from "store/tech/tech.actions";
 import { getConnetionStatus } from "store/tech/tech.selectors";
 import { ConnectionStatus } from "store/tech/tech.reducer";
+import { InvalidRefreshToken } from "errors/invalid-refresh-token";
+import { logout } from "store/user/actions";
+import { ErrorCodes } from "errors/error-codes";
 
 export const syncStart = (): TodosActions => ({
   type: todosActionTypes.SYNC_START,
@@ -23,6 +26,26 @@ export const setTodoItems = ({ items }: { items: ITodo[] }) => ({
   payload: { items },
 });
 
+export const syncOutboundRequests = (): AppThunk => async (
+  dispatch,
+  getState
+) => {
+  const connectionStatus = getConnetionStatus(getState());
+  if (connectionStatus !== ConnectionStatus.online) {
+    return;
+  }
+  return todosIDB.syncOutboundRequests();
+};
+
+export const updateTodosFromIDB = (): AppThunk => async (dispatch) => {
+  // Retrieve from Idb
+  const dbTodos = await todosIDB.getAllTodos();
+
+  // save to redux
+  dispatch(setTodoItems({ items: dbTodos }));
+  return;
+};
+
 export const syncTodos = (): AppThunk => async (dispatch, getState) => {
   try {
     const currentState = getState();
@@ -32,7 +55,6 @@ export const syncTodos = (): AppThunk => async (dispatch, getState) => {
       return;
     }
     dispatch(syncStart());
-    await todosIDB.syncOutboundRequests();
     // If there're no items loaded during initialization then make full fetch
     if (!getTodoItems(currentState).length) {
       const {
@@ -57,26 +79,27 @@ export const syncTodos = (): AppThunk => async (dispatch, getState) => {
       const {
         data: { items, lastTimeUpdated: newLastTimeUpdated },
       } = await todosService.getChanges({ lastTimeUpdated });
-      console.log("changes: response.data", items);
-      if (!items.length) {
-        // no changes
-        return;
+      if (items.length) {
+        await todosIDB.updateTodos(items, newLastTimeUpdated);
+        await dispatch(updateTodosFromIDB());
       }
-      // save/update to idb
-      todosIDB.updateTodos(items, newLastTimeUpdated);
-
-      // Retrieve from Idb
-      const dbTodos = await todosIDB.getAllTodos();
-
-      // save to redux
-      dispatch(setTodoItems({ items: dbTodos }));
     }
+    await dispatch(syncOutboundRequests());
   } catch (error) {
-    console.dir(error);
-    // Set status to offline
-    // Try fetching some dummy endpoint every 1 second to find out when we become online
-    dispatch(setStatusOffline());
-    dispatch(checkConnection(syncTodos));
+    console.error(error);
+
+    if (error instanceof InvalidRefreshToken) {
+      // logout
+      dispatch(logout());
+      return;
+    }
+
+    if (error.code === ErrorCodes.AXIOS_CONNECTION_TIMEOUT) {
+      // Set status to offline
+      // Try fetching some dummy endpoint every 1 second to find out when we become online
+      dispatch(setStatusOffline());
+      // dispatch(checkConnection(syncTodos));
+    }
   } finally {
     dispatch(syncStop());
   }

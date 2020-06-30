@@ -8,7 +8,7 @@ import { getTodoItemState } from "store/todo/todo.selectors";
 import SaveTodoBtn from "./elements/save-todo-btn";
 import { ITodo, ITodoRecord } from "models/ITodo";
 import { postTodo, setSingleTodo, resetTodo } from "store/todo/todo.actions";
-import { getSyncState } from "store/todos/todos.selectors";
+import { getSyncState, getTodoItems } from "store/todos/todos.selectors";
 import { getUserState } from "store/user/selectors";
 
 type SingleTodoProps = RouteComponentProps<{ id?: string }> & {
@@ -18,6 +18,7 @@ type SingleTodoProps = RouteComponentProps<{ id?: string }> & {
 const SingleTodo = ({ match, isNew }: SingleTodoProps) => {
   const classes = useStyles();
   const todoToEdit = useSelector(getTodoItemState);
+  const todos = useSelector(getTodoItems);
   const syncing = useSelector(getSyncState);
   const dispatch = useDispatch();
   const [todo, setTodo] = useState<ITodo>(todoToEdit);
@@ -42,7 +43,7 @@ const SingleTodo = ({ match, isNew }: SingleTodoProps) => {
       // TODO
       // redirect
     }
-  }, [isNew, dispatch, match.params.id, syncing]);
+  }, [isNew, dispatch, match.params.id, syncing, todos]);
 
   useEffect(() => {
     setTodo(todoToEdit);
