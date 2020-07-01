@@ -1,11 +1,10 @@
 import React from "react";
 import { Route, Switch, Redirect } from "react-router-dom";
 import { SignIn } from "pages/auth/signin";
-import { ProtectedRoute } from "components/route";
-import { Profile } from "pages/profile";
 import { useSelector } from "react-redux";
 import { getIsAuthenticated } from "store/user/selectors";
-import Todos from "./pages/todos";
+import { AuthRoutes } from "./auth-routes";
+import { ProtectedRoute } from "components/route";
 
 export const Routes = () => {
   const isAuthenticated = useSelector(getIsAuthenticated);
@@ -18,9 +17,7 @@ export const Routes = () => {
           isAuthenticated ? <Redirect to="/todos" /> : <SignIn {...props} />
         }
       />
-      <ProtectedRoute path="/todos" component={Todos} />
-      <ProtectedRoute path="/profile" component={Profile} />
-      <Redirect to="/todos" />
+      <ProtectedRoute component={AuthRoutes} />
     </Switch>
   );
 };
