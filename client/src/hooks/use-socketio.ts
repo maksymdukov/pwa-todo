@@ -35,6 +35,7 @@ export const useSocketIO = () => {
     });
     socketRef.current.on("connect", () => {
       console.log("Connected to server event");
+      // TODO make a separate action runOnlineActions
       dispatch(setStatusOnline());
       dispatch(syncTodos());
     });
@@ -56,6 +57,7 @@ export const useSocketIO = () => {
     });
     socketRef.current.on("connect_error", (error: any) => {
       console.log("connect_error event", error);
+      // TODO make a separate action runOfflineActions
       const connectionStatus = getConnetionStatus(store.getState());
       if (connectionStatus === ConnectionStatus.online) {
         dispatch(setStatusOffline());

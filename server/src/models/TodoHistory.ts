@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import { TodoHistoryReason } from './TodoHistoryReason';
-import { TodoDocument, todoSchema } from './Todo';
+import { TodoDocument } from './Todo';
 import { UserDocument } from './User';
 import { io } from '../server';
 import { SocketEvents } from '../config/socketio';

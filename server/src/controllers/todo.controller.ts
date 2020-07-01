@@ -5,6 +5,7 @@ import webpush from 'web-push';
 import { TodoHistory } from '../models/TodoHistory';
 import { TodoHistoryReason } from '../models/TodoHistoryReason';
 import { TodoRecordDocument } from '../models/TodoRecord';
+import { Notification } from '../models/Notification';
 
 export const getMyTodos = async (req: Request, res: Response) => {
   const user = req.user as UserDocument;
@@ -108,6 +109,18 @@ export const deleteTodo = async (req: Request, res: Response) => {
     todo: todo,
     reason: TodoHistoryReason.deleted,
   });
+
+  // Create notification documents for all shared users
+  await Promise.all(
+    historyRecord.userId.map((usr) =>
+      Notification.build({
+        sender: req.user.id,
+        recipient: usr,
+        reason: TodoHistoryReason.unshared,
+        data: todo.toJSON(),
+      })
+    )
+  );
   res.json({});
 };
 
@@ -135,11 +148,19 @@ export const shareTodo = async (req: Request, res: Response) => {
 
   const populatedTodo = await Todo.findTodoById(todoId);
 
-  // Savee history record
-  const historyRecord = await TodoHistory.build({
+  // Save history record
+  await TodoHistory.build({
     userIds: [user.id],
     todo: populatedTodo,
     reason: TodoHistoryReason.shared,
+  });
+
+  // Create notification document
+  await Notification.build({
+    sender: req.user.id,
+    recipient: userId,
+    reason: TodoHistoryReason.shared,
+    data: populatedTodo.toJSON(),
   });
 
   // Webpush
@@ -177,6 +198,14 @@ export const revokeTodoShare = async (req: Request, res: Response) => {
     userIds: [user.id, userId],
     todo: populatedTodo,
     reason: TodoHistoryReason.unshared,
+  });
+
+  // Create notification document
+  await Notification.build({
+    sender: req.user.id,
+    recipient: userId,
+    reason: TodoHistoryReason.unshared,
+    data: populatedTodo.toJSON(),
   });
 
   res.end();
