@@ -6,7 +6,7 @@ import { getTodoItems, getSyncState } from "./todos.selectors";
 import { idb } from "services/idb.service";
 import { KeyValKeys } from "models/KeyValStore";
 import { todosIDB } from "services/todos-idb.service";
-import { setStatusOffline } from "store/tech/tech.actions";
+import { runOfflineActions } from "store/tech/tech.actions";
 import { getConnetionStatus } from "store/tech/tech.selectors";
 import { ConnectionStatus } from "store/tech/tech.reducer";
 import { InvalidRefreshToken } from "errors/invalid-refresh-token";
@@ -96,9 +96,7 @@ export const syncTodos = (): AppThunk => async (dispatch, getState) => {
 
     if (error.code === ErrorCodes.AXIOS_CONNECTION_TIMEOUT) {
       // Set status to offline
-      // Try fetching some dummy endpoint every 1 second to find out when we become online
-      dispatch(setStatusOffline());
-      // dispatch(checkConnection(syncTodos));
+      dispatch(runOfflineActions());
     }
   } finally {
     dispatch(syncStop());

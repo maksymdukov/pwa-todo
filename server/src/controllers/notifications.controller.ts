@@ -15,6 +15,14 @@ export const getUnreadNotifcations = async (req: Request, res: Response) => {
   res.json(notifications);
 };
 
+export const getUnreadCount = async (req: Request, res: Response) => {
+  const total = await Notification.countReadOrUnread({
+    recipientId: req.user.id,
+    read: false,
+  });
+  res.json({ total });
+};
+
 export const getReadNotifcations = async (req: Request, res: Response) => {
   const { page, size } = req.query as {
     page: string | undefined;

@@ -3,11 +3,9 @@ import { useCallback, useRef } from "react";
 import { config } from "config/config";
 import { authPersistence } from "services/auth-persistence";
 import { SocketEvents } from "constants/socketio";
-import { useDispatch, useStore } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { syncTodos, updateTodosFromIDB } from "store/todos/todos.actions";
-import { setStatusOffline, setStatusOnline } from "store/tech/tech.actions";
-import { getConnetionStatus } from "store/tech/tech.selectors";
-import { ConnectionStatus } from "store/tech/tech.reducer";
+import { runOfflineActions, runOnlineActions } from "store/tech/tech.actions";
 import { usersService } from "services/users.service";
 import { InvalidRefreshToken } from "errors/invalid-refresh-token";
 import { logout } from "store/user/actions";
@@ -15,11 +13,29 @@ import { wait } from "utils/timeout";
 import { JSONparse } from "utils/json";
 import { TodoHistoryChange } from "models/ITodoHistoryChange";
 import { todosIDB } from "services/todos-idb.service";
+import { TodoHistoryReason } from "models/TodoHistoryReason";
+import { getUserState } from "store/user/selectors";
+import { fetchUnreadNotifications } from "store/unread-notifications/notifications.actions";
 
 export const useSocketIO = () => {
   const dispatch = useDispatch();
-  const store = useStore();
+  const userState = useSelector(getUserState);
   const socketRef = useRef<SocketIOClient.Socket | undefined>();
+
+  const updateNotifications = useCallback(
+    async (todoHistory: TodoHistoryChange) => {
+      if (
+        todoHistory.todo.creator.id !== userState.id &&
+        (todoHistory.reason === TodoHistoryReason.shared ||
+          todoHistory.reason === TodoHistoryReason.unshared ||
+          todoHistory.reason === TodoHistoryReason.deleted)
+      ) {
+        dispatch(fetchUnreadNotifications());
+      }
+    },
+    [userState, dispatch]
+  );
+
   const initSocket = useCallback(async () => {
     socketRef.current = io.connect(config.URL!, {
       autoConnect: true,
@@ -35,9 +51,7 @@ export const useSocketIO = () => {
     });
     socketRef.current.on("connect", () => {
       console.log("Connected to server event");
-      // TODO make a separate action runOnlineActions
-      dispatch(setStatusOnline());
-      dispatch(syncTodos());
+      dispatch(runOnlineActions());
     });
     socketRef.current.on("reconnect_attempt", (numb: any) => {
       console.log("reconnect_attempt event", numb);
@@ -51,17 +65,14 @@ export const useSocketIO = () => {
           new Date(historyChange.createdAt).getTime()
         );
         await dispatch(updateTodosFromIDB());
+        await updateNotifications(historyChange);
       } else {
         dispatch(syncTodos());
       }
     });
     socketRef.current.on("connect_error", (error: any) => {
       console.log("connect_error event", error);
-      // TODO make a separate action runOfflineActions
-      const connectionStatus = getConnetionStatus(store.getState());
-      if (connectionStatus === ConnectionStatus.online) {
-        dispatch(setStatusOffline());
-      }
+      dispatch(runOfflineActions());
     });
     socketRef.current.on("connect_timeout", (error: any) => {
       console.log("connect_timeout event", error);
@@ -95,6 +106,6 @@ export const useSocketIO = () => {
       }
     });
     return socketRef.current;
-  }, [dispatch, socketRef, store]);
+  }, [dispatch, socketRef, updateNotifications]);
   return { initSocket, socketRef: socketRef };
 };

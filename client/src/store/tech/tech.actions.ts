@@ -4,6 +4,8 @@ import { techService } from "services/tech.service";
 import { wait } from "utils/timeout";
 import { getConnetionStatus } from "./tech.selectors";
 import { ConnectionStatus } from "./tech.reducer";
+import { syncTodos } from "store/todos/todos.actions";
+import { fetchUnreadCount } from "store/unread-notifications/notifications.actions";
 
 export const setStatusOnline = (): TechActions => ({
   type: techActionTypes.SET_STATUS_ONLINE,
@@ -35,5 +37,21 @@ export const checkConnection = (
     } finally {
       await wait(1);
     }
+  }
+};
+
+export const runOnlineActions = (): AppThunk => async (dispatch, getState) => {
+  const connectionStatus = getConnetionStatus(getState());
+  if (connectionStatus === ConnectionStatus.offline) {
+    dispatch(setStatusOnline());
+  }
+  await dispatch(syncTodos());
+  await dispatch(fetchUnreadCount());
+};
+
+export const runOfflineActions = (): AppThunk => async (dispatch, getState) => {
+  const connectionStatus = getConnetionStatus(getState());
+  if (connectionStatus === ConnectionStatus.online) {
+    dispatch(setStatusOffline());
   }
 };

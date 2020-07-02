@@ -11,6 +11,7 @@ const {
   getItems,
   getPagination,
   getStatus,
+  setTotal,
 } = makePaginatedReducer<INotification>(
   "unreadNotifications",
   (state) => state.unreadNotifications
@@ -26,4 +27,5 @@ export {
   getItems as getUnreadNotificationsItems,
   getPagination as getUnreadNotificationsPagination,
   getStatus as getUnreadNotificationsStatus,
+  setTotal as setTotalUnreadNotifications,
 };

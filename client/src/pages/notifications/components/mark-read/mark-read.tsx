@@ -4,6 +4,8 @@ import { useSelector, useDispatch } from "react-redux";
 import { getUnreadNotificationsItems } from "store/unread-notifications/notifications.slice";
 import { notificationsService } from "services/notifications.service";
 import { fetchUnreadNotifications } from "store/unread-notifications/notifications.actions";
+import { ConnectionStatus } from "store/tech/tech.reducer";
+import { getConnetionStatus } from "store/tech/tech.selectors";
 
 interface MarkBtnState {
   loading: boolean;
@@ -12,6 +14,7 @@ interface MarkBtnState {
 
 const MarkRead = () => {
   const dispatch = useDispatch();
+  const connectionStatus = useSelector(getConnetionStatus);
   const items = useSelector(getUnreadNotificationsItems);
   const [state, setState] = useState<MarkBtnState>({
     loading: false,
@@ -30,7 +33,12 @@ const MarkRead = () => {
   };
   return (
     <Box textAlign="right">
-      <Button variant="text" color="primary" onClick={handleClick}>
+      <Button
+        variant="text"
+        color="primary"
+        onClick={handleClick}
+        disabled={connectionStatus === ConnectionStatus.offline}
+      >
         {state.loading ? "Loading..." : "Mark read"}
       </Button>
     </Box>

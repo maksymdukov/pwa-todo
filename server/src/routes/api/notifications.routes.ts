@@ -9,6 +9,7 @@ import {
   getUnreadNotifcations,
   getReadNotifcations,
   markNotificationsRead,
+  getUnreadCount,
 } from '../../controllers/notifications.controller';
 
 export const notificationRouter = Router();
@@ -21,6 +22,8 @@ notificationRouter.get(
   validateInput,
   getUnreadNotifcations
 );
+
+notificationRouter.get('/unreadcount', getUnreadCount);
 
 notificationRouter.get(
   '/read',

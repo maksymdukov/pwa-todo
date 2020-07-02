@@ -7,6 +7,7 @@ import {
   Typography,
   Paper,
   makeStyles,
+  Box,
 } from "@material-ui/core";
 import { INotification } from "models/INotification";
 import UserAvatar from "components/user-avatar";
@@ -16,6 +17,8 @@ import { AppThunk } from "store/tools";
 import { AppState } from "store/store";
 import { PaginatedStatus } from "utils/redux/paginatedSlice";
 import Spinner from "components/spinner";
+import { getConnetionStatus } from "store/tech/tech.selectors";
+import { ConnectionStatus } from "store/tech/tech.reducer";
 
 interface NotiListProps {
   unread: boolean;
@@ -31,6 +34,9 @@ const useStyles = makeStyles({
   listItem: {
     marginBottom: "1rem",
   },
+  offline: {
+    opacity: 0.5,
+  },
 });
 
 const NotiList = ({
@@ -40,21 +46,29 @@ const NotiList = ({
   fetchAction,
 }: NotiListProps) => {
   const classes = useStyles();
+  const connectionStatus = useSelector(getConnetionStatus);
   const dispatch = useDispatch();
   const items = useSelector(getItems);
   const status = useSelector(getStatus);
   useEffect(() => {
-    dispatch(fetchAction());
-  }, [dispatch, fetchAction]);
+    if (connectionStatus === ConnectionStatus.online) {
+      dispatch(fetchAction());
+    }
+  }, [dispatch, fetchAction, connectionStatus]);
 
   if (status === PaginatedStatus.FETCH_IN_PROGRESS) {
     return <Spinner isActive={true} />;
   }
 
-  return (
+  return connectionStatus === ConnectionStatus.online ? (
     <List className={clsx(!unread && classes.readList)}>
       {items.map((noti) => (
-        <ListItem key={noti.id} component={Paper} className={classes.listItem} elevation={3}>
+        <ListItem
+          key={noti.id}
+          component={Paper}
+          className={classes.listItem}
+          elevation={3}
+        >
           <ListItemAvatar>
             <UserAvatar src={noti.sender.profile.picture} />
           </ListItemAvatar>
@@ -66,6 +80,10 @@ const NotiList = ({
         </ListItem>
       ))}
     </List>
+  ) : (
+    <Box className={classes.offline}>
+      <Typography variant="h4">Not available when offline</Typography>
+    </Box>
   );
 };
 

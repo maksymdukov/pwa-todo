@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { setStatusOnline, setStatusOffline } from "store/tech/tech.actions";
-import { syncTodos } from "store/todos/todos.actions";
+import { runOnlineActions, runOfflineActions } from "store/tech/tech.actions";
 
 export const useConnectionStatus = () => {
   const dispatch = useDispatch();
@@ -10,10 +9,9 @@ export const useConnectionStatus = () => {
       console.log("navigator.onLine changed", navigator.onLine);
 
       if (navigator.onLine) {
-        dispatch(setStatusOnline());
-        dispatch(syncTodos());
+        dispatch(runOnlineActions());
       } else {
-        dispatch(setStatusOffline());
+        dispatch(runOfflineActions());
       }
     };
     window.addEventListener("online", updateOnlineStatus);

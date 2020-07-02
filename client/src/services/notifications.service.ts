@@ -10,6 +10,13 @@ export class NotificationsService extends Base {
     });
   }
 
+  async getUnreadCount() {
+    return this.request<{ total: number }>({
+      url: "/unreadcount",
+      method: "GET",
+    });
+  }
+
   async getRead() {
     return this.request<PaginatedResponse<INotification>>({
       url: "/read?size=100",

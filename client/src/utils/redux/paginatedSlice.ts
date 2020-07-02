@@ -26,6 +26,7 @@ enum paginatedActionTypes {
   FETCH_SUCCESS = "FETCH_SUCCESS",
   FETCH_FAIL = "FETCH_FAIL",
   FETCH_RESET = "FETCH_RESET",
+  SET_TOTAL = "SET_TOTAL",
 }
 
 export interface FetchStart {
@@ -46,11 +47,17 @@ export interface FetchReset {
   type: string;
 }
 
+export interface SetTotal {
+  type: string;
+  payload: { total: number };
+}
+
 type PaginatedActions<T> =
   | FetchStart
   | FetchSuccess<T>
   | FetchFail
-  | FetchReset;
+  | FetchReset
+  | SetTotal;
 
 const DEFAULT_PAGE = 1;
 const DEFAULT_SIZE = 20;
@@ -76,6 +83,7 @@ export const makePaginatedReducer = <D>(
       case `${name}/${paginatedActionTypes.FETCH_START}`:
         return {
           ...state,
+          items: [],
           status: PaginatedStatus.FETCH_IN_PROGRESS,
           error: null,
         };
@@ -105,6 +113,12 @@ export const makePaginatedReducer = <D>(
           total: 0,
           page: DEFAULT_PAGE,
           size: DEFAULT_SIZE,
+        };
+      case `${name}/${paginatedActionTypes.SET_TOTAL}`:
+        return {
+          ...state,
+          // @ts-expect-error
+          total: action.payload.total,
         };
       default:
         return state;
@@ -139,6 +153,11 @@ export const makePaginatedReducer = <D>(
     type: `${name}/${paginatedActionTypes.FETCH_RESET}`,
   });
 
+  const setTotal = (total: number): PaginatedActions<D> => ({
+    type: `${name}/${paginatedActionTypes.SET_TOTAL}`,
+    payload: { total },
+  });
+
   const getItems = createSelector(getSliceState, ({ items }) => items);
 
   const getStatus = createSelector(getSliceState, ({ status }) => status);
@@ -156,6 +175,7 @@ export const makePaginatedReducer = <D>(
     fetchFail,
     fetchSuccess,
     fetchReset,
+    setTotal,
     getItems,
     getStatus,
     getError,
