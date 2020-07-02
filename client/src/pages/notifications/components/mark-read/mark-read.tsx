@@ -37,7 +37,9 @@ const MarkRead = () => {
         variant="text"
         color="primary"
         onClick={handleClick}
-        disabled={connectionStatus === ConnectionStatus.offline}
+        disabled={
+          connectionStatus === ConnectionStatus.offline || !items.length
+        }
       >
         {state.loading ? "Loading..." : "Mark read"}
       </Button>

@@ -10,6 +10,7 @@ import { ITodo, ITodoRecord } from "models/ITodo";
 import { postTodo, setSingleTodo, resetTodo } from "store/todo/todo.actions";
 import { getSyncState, getTodoItems } from "store/todos/todos.selectors";
 import { getUserState } from "store/user/selectors";
+import { SyncStatus } from "store/todos/todos.reducer";
 
 type SingleTodoProps = RouteComponentProps<{ id?: string }> & {
   isNew?: boolean;
@@ -19,10 +20,12 @@ const SingleTodo = ({ match, isNew }: SingleTodoProps) => {
   const classes = useStyles();
   const todoToEdit = useSelector(getTodoItemState);
   const todos = useSelector(getTodoItems);
-  const syncing = useSelector(getSyncState);
+  const syncStatus = useSelector(getSyncState);
   const dispatch = useDispatch();
   const [todo, setTodo] = useState<ITodo>(todoToEdit);
   const userProfile = useSelector(getUserState);
+
+  const syncing = syncStatus === SyncStatus.IN_PROGRESS;
 
   const isEditable = isNew || userProfile.id === todo.creator.id;
 

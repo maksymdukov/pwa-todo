@@ -1,4 +1,4 @@
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useCallback } from "react";
 import { setTodoItems } from "store/todos/todos.actions";
 import { todosIDB } from "services/todos-idb.service";

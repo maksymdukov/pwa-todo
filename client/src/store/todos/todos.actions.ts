@@ -12,13 +12,22 @@ import { ConnectionStatus } from "store/tech/tech.reducer";
 import { InvalidRefreshToken } from "errors/invalid-refresh-token";
 import { logout } from "store/user/actions";
 import { ErrorCodes } from "errors/error-codes";
+import { SyncStatus } from "./todos.reducer";
 
-export const syncStart = (): TodosActions => ({
-  type: todosActionTypes.SYNC_START,
+export const syncInProgress = (): TodosActions => ({
+  type: todosActionTypes.SYNC_IN_PROGRESS,
 });
 
-export const syncStop = (): TodosActions => ({
-  type: todosActionTypes.SYNC_STOP,
+export const syncSuccess = (): TodosActions => ({
+  type: todosActionTypes.SYNC_SUCCESS,
+});
+
+export const syncFail = (): TodosActions => ({
+  type: todosActionTypes.SYNC_FAIL,
+});
+
+export const syncReset = (): TodosActions => ({
+  type: todosActionTypes.SYNC_RESET,
 });
 
 export const setTodoItems = ({ items }: { items: ITodo[] }) => ({
@@ -50,11 +59,14 @@ export const syncTodos = (): AppThunk => async (dispatch, getState) => {
   try {
     const currentState = getState();
     const connectionStatus = getConnetionStatus(currentState);
-    const isSycning = getSyncState(currentState);
-    if (connectionStatus === ConnectionStatus.offline || isSycning) {
+    const syncStatus = getSyncState(currentState);
+    if (
+      connectionStatus === ConnectionStatus.offline ||
+      syncStatus === SyncStatus.IN_PROGRESS
+    ) {
       return;
     }
-    dispatch(syncStart());
+    dispatch(syncInProgress());
     // If there're no items loaded during initialization then make full fetch
     if (!getTodoItems(currentState).length) {
       const {
@@ -84,8 +96,10 @@ export const syncTodos = (): AppThunk => async (dispatch, getState) => {
         await dispatch(updateTodosFromIDB());
       }
     }
+    dispatch(syncSuccess());
     await dispatch(syncOutboundRequests());
   } catch (error) {
+    dispatch(syncFail());
     console.error(error);
 
     if (error instanceof InvalidRefreshToken) {
@@ -98,7 +112,5 @@ export const syncTodos = (): AppThunk => async (dispatch, getState) => {
       // Set status to offline
       dispatch(runOfflineActions());
     }
-  } finally {
-    dispatch(syncStop());
   }
 };

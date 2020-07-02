@@ -12,6 +12,7 @@ import {
 import { TodosScopes } from "pages/todos/todo-scopes";
 import { Typography } from "@material-ui/core";
 import CreateTodoBtn from "../create-todo-btn/create-todo-btn";
+import { SyncStatus } from "store/todos/todos.reducer";
 
 type TodosViewProps = {
   scope: TodosScopes;
@@ -39,7 +40,8 @@ const todosSelector = {
 const TodosView = ({ scope }: TodosViewProps) => {
   const todoSelector = todosSelector[scope];
   const todos = useSelector(todoSelector);
-  const syncing = useSelector(getSyncState);
+  const syncStatus = useSelector(getSyncState);
+  const syncing = syncStatus === SyncStatus.IN_PROGRESS;
   return (
     <div>
       <Typography variant="h4" align="center" gutterBottom>

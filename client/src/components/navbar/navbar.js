@@ -21,6 +21,7 @@ import { getSyncState } from "store/todos/todos.selectors";
 import { syncTodos } from "store/todos/todos.actions";
 import { getConnetionStatus } from "store/tech/tech.selectors";
 import { ConnectionStatus } from "store/tech/tech.reducer";
+import { SyncStatus } from "store/todos/todos.reducer";
 
 const useStyles = makeStyles((theme) => ({
   title: {
@@ -42,12 +43,14 @@ const useStyles = makeStyles((theme) => ({
 
 export const Navbar = ({ onDrawerOpen }) => {
   const history = useHistory();
-  const syncing = useSelector(getSyncState);
+  const syncStatus = useSelector(getSyncState);
   const isAuth = useSelector(getIsAuthenticated);
   const isAuthenticating = useSelector(getIsAuthenticating);
   const status = useSelector(getConnetionStatus);
   const classes = useStyles();
   const dispatch = useDispatch();
+
+  const syncing = syncStatus === SyncStatus.IN_PROGRESS;
 
   const doSync = () => {
     dispatch(syncTodos());

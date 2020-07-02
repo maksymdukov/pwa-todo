@@ -83,7 +83,6 @@ export const makePaginatedReducer = <D>(
       case `${name}/${paginatedActionTypes.FETCH_START}`:
         return {
           ...state,
-          items: [],
           status: PaginatedStatus.FETCH_IN_PROGRESS,
           error: null,
         };

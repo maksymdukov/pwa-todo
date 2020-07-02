@@ -1,17 +1,27 @@
 import { ITodo } from "models/ITodo";
 
 export enum todosActionTypes {
-  SYNC_START = "SYNC_START",
-  SYNC_STOP = "SYNC_STOP",
+  SYNC_IN_PROGRESS = "SYNC_IN_PROGRESS",
+  SYNC_RESET = "SYNC_RESET",
   SET_TODO_ITEMS = "SET_TODO_ITEMS",
+  SYNC_SUCCESS = "SYNC_SUCCESS",
+  SYNC_FAIL = "SYNC_FAIL",
 }
 
-export interface TodosSyncStart {
-  type: todosActionTypes.SYNC_START;
+export interface TodosSyncInProgress {
+  type: todosActionTypes.SYNC_IN_PROGRESS;
 }
 
-export interface TodosSyncStop {
-  type: todosActionTypes.SYNC_STOP;
+export interface TodosSyncReset {
+  type: todosActionTypes.SYNC_RESET;
+}
+
+export interface TodosSyncSuccess {
+  type: todosActionTypes.SYNC_SUCCESS;
+}
+
+export interface TodosSyncFail {
+  type: todosActionTypes.SYNC_FAIL;
 }
 
 export interface SetTodoItems {
@@ -19,4 +29,9 @@ export interface SetTodoItems {
   payload: { items: ITodo[] };
 }
 
-export type TodosActions = TodosSyncStart | TodosSyncStop | SetTodoItems;
+export type TodosActions =
+  | TodosSyncInProgress
+  | TodosSyncReset
+  | TodosSyncSuccess
+  | TodosSyncFail
+  | SetTodoItems;
