@@ -15,11 +15,13 @@ import { useSelector } from "react-redux";
 import { getIsAuthenticated } from "store/user/selectors";
 import { DrawerListItem } from "./drawer-list-item";
 import { Link } from "react-router-dom";
+import NotificationsCount from "./notifications-count";
 
 export type IMenuLink = {
   label: string;
   icon: typeof SvgIcon;
   to: string;
+  afterLabel?: React.FC;
   offset?: number;
   highlighted?: boolean;
   onClick?: () => void;
@@ -45,7 +47,12 @@ const links: IMenuLink[] = [
       },
     ],
   },
-  { label: "Notifications", icon: NotificationsIcon, to: "/notifications" },
+  {
+    label: "Notifications",
+    icon: NotificationsIcon,
+    to: "/notifications",
+    afterLabel: NotificationsCount,
+  },
 ];
 
 const useStyles = makeStyles((theme) => ({

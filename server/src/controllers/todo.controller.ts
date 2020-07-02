@@ -5,7 +5,7 @@ import webpush from 'web-push';
 import { TodoHistory } from '../models/TodoHistory';
 import { TodoHistoryReason } from '../models/TodoHistoryReason';
 import { TodoRecordDocument } from '../models/TodoRecord';
-import { Notification } from '../models/Notification';
+import { Notification, NotificationDocument } from '../models/Notification';
 
 export const getMyTodos = async (req: Request, res: Response) => {
   const user = req.user as UserDocument;
@@ -112,13 +112,21 @@ export const deleteTodo = async (req: Request, res: Response) => {
 
   // Create notification documents for all shared users
   await Promise.all(
-    historyRecord.userId.map((usr) =>
-      Notification.build({
-        sender: req.user.id,
-        recipient: usr,
-        reason: TodoHistoryReason.unshared,
-        data: todo.toJSON(),
-      })
+    historyRecord.userId.reduce(
+      (promises: Promise<NotificationDocument>[], usr) => {
+        if (usr !== req.user.id) {
+          promises.push(
+            Notification.build({
+              sender: req.user.id,
+              recipient: usr,
+              reason: TodoHistoryReason.deleted,
+              data: todo.toJSON(),
+            })
+          );
+        }
+        return promises;
+      },
+      []
     )
   );
   res.json({});

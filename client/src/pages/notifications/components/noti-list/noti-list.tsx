@@ -13,10 +13,14 @@ import UserAvatar from "components/user-avatar";
 import clsx from "clsx";
 import { useDispatch, useSelector } from "react-redux";
 import { AppThunk } from "store/tools";
+import { AppState } from "store/store";
+import { PaginatedStatus } from "utils/redux/paginatedSlice";
+import Spinner from "components/spinner";
 
 interface NotiListProps {
   unread: boolean;
-  getItems: (state: any) => INotification[];
+  getItems: (state: AppState) => INotification[];
+  getStatus: (state: AppState) => PaginatedStatus;
   fetchAction: () => AppThunk;
 }
 
@@ -29,17 +33,28 @@ const useStyles = makeStyles({
   },
 });
 
-const NotiList = ({ unread, getItems, fetchAction }: NotiListProps) => {
+const NotiList = ({
+  unread,
+  getItems,
+  getStatus,
+  fetchAction,
+}: NotiListProps) => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const items = useSelector(getItems);
+  const status = useSelector(getStatus);
   useEffect(() => {
     dispatch(fetchAction());
   }, [dispatch, fetchAction]);
+
+  if (status === PaginatedStatus.FETCH_IN_PROGRESS) {
+    return <Spinner isActive={true} />;
+  }
+
   return (
     <List className={clsx(!unread && classes.readList)}>
       {items.map((noti) => (
-        <ListItem key={noti.id} component={Paper} className={classes.listItem}>
+        <ListItem key={noti.id} component={Paper} className={classes.listItem} elevation={3}>
           <ListItemAvatar>
             <UserAvatar src={noti.sender.profile.picture} />
           </ListItemAvatar>

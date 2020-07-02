@@ -1,7 +1,6 @@
-import { AppState } from "store/store";
 import { createSelector } from "reselect";
 
-enum PaginatedStatus {
+export enum PaginatedStatus {
   FETCH_IN_PROGRESS = "FETCH_IN_PROGRESS",
   FETCH_SUCCESS = "FETCH_SUCCESS",
   FETCH_FAIL = "FETCH_FAIL",

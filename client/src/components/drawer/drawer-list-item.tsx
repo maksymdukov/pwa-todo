@@ -22,6 +22,7 @@ export const DrawerListItem = ({
   icon: Icon,
   onClick,
   sub,
+  afterLabel: AfterLabel,
   highlighted = true,
 }: IMenuLink) => {
   const classes = useStyles();
@@ -48,6 +49,7 @@ export const DrawerListItem = ({
           primaryTypographyProps={{ className: classes.listItemText }}
         >
           {label}
+          {AfterLabel && <AfterLabel />}
         </ListItemText>
       </ListItem>
       {sub &&

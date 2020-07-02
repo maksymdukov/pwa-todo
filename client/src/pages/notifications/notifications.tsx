@@ -2,9 +2,15 @@ import React from "react";
 import { Tabs, Tab, Paper } from "@material-ui/core";
 import NotiList from "./components/noti-list/noti-list";
 import { fetchUnreadNotifications } from "store/unread-notifications/notifications.actions";
-import { getUnreadNotificationsItems } from "store/unread-notifications/notifications.slice";
+import {
+  getUnreadNotificationsItems,
+  getUnreadNotificationsStatus,
+} from "store/unread-notifications/notifications.slice";
 import { fetchReadNotifications } from "store/read-notifications/read-notifications.actions";
-import { getReadNotificationsItems } from "store/read-notifications/read-notifications.slice";
+import {
+  getReadNotificationsItems,
+  getReadNotificationsStatus,
+} from "store/read-notifications/read-notifications.slice";
 import MarkRead from "./components/mark-read/mark-read";
 
 const Notifications = () => {
@@ -34,6 +40,7 @@ const Notifications = () => {
           <NotiList
             fetchAction={fetchUnreadNotifications}
             getItems={getUnreadNotificationsItems}
+            getStatus={getUnreadNotificationsStatus}
             unread={true}
           />
         </>
@@ -42,6 +49,7 @@ const Notifications = () => {
         <NotiList
           fetchAction={fetchReadNotifications}
           getItems={getReadNotificationsItems}
+          getStatus={getReadNotificationsStatus}
           unread={false}
         />
       )}
