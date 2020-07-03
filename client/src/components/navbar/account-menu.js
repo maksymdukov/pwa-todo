@@ -1,13 +1,6 @@
 import React, { useState } from "react";
-import {
-  IconButton,
-  Menu,
-  Typography,
-  Box,
-  Divider
-} from "@material-ui/core";
+import { IconButton, Menu, Typography, Box, Divider } from "@material-ui/core";
 import FaceIcon from "@material-ui/icons/Face";
-import PeopleIcon from "@material-ui/icons/People";
 import { logout } from "store/user/actions";
 import { useDispatch, useSelector } from "react-redux";
 import { AccountMenuItem } from "./account-menu-item";
@@ -17,17 +10,14 @@ import { getUserState } from "store/user/selectors";
 import { makeStyles } from "@material-ui/core/styles";
 import UserAvatar from "components/user-avatar";
 
-const menuLinks = [
-  { label: "My profile", icon: FaceIcon, to: "/profile" },
-  { label: "Friends", icon: PeopleIcon, to: "/friends" }
-];
+const menuLinks = [{ label: "My profile", icon: FaceIcon, to: "/profile" }];
 
 const useStyles = makeStyles({
   pic: {
     width: "1em",
     height: "1em",
-    fontSize: "inherit"
-  }
+    fontSize: "inherit",
+  },
 });
 
 export const AccountMenu = () => {
@@ -37,7 +27,7 @@ export const AccountMenu = () => {
   const user = useSelector(getUserState);
   const [anchorEl, setAnchor] = useState(null);
 
-  const onAccountClick = e => {
+  const onAccountClick = (e) => {
     setAnchor(e.currentTarget);
   };
 

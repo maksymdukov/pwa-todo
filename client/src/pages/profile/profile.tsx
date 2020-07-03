@@ -6,12 +6,15 @@ import { useSelector } from "react-redux";
 import { getUserState } from "store/user/selectors";
 import { makeStyles } from "@material-ui/core/styles";
 import { DeleteAccount } from "pages/profile/components/delete-account/delete-account";
+import { getConnetionStatus } from "store/tech/tech.selectors";
+import { ConnectionStatus } from "store/tech/tech.reducer";
+import OfflineLabel from "components/typography/offline";
 
 const useStyles = makeStyles(() => ({
   form: {
     maxWidth: 500,
-    margin: "auto"
-  }
+    margin: "auto",
+  },
 }));
 
 export interface ProfileFormValues {
@@ -26,13 +29,19 @@ export interface ProfileFormValues {
 export const Profile = () => {
   const classes = useStyles();
   const user = useSelector(getUserState);
+  const connectionStatus = useSelector(getConnetionStatus);
+
+  if (connectionStatus === ConnectionStatus.offline) {
+    return <OfflineLabel />;
+  }
+
   const initialValues: ProfileFormValues = {
     email: user.email || "",
     firstName: user.firstName || "",
     lastName: user.lastName || "",
     picture: user.picture || "",
     password: "",
-    confirmPassword: ""
+    confirmPassword: "",
   };
   return (
     <section>

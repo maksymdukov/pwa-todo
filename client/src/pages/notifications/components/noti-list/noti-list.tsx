@@ -25,6 +25,7 @@ import { TodoHistoryReason } from "models/TodoHistoryReason";
 import { Link } from "react-router-dom";
 import { notificationsService } from "services/notifications.service";
 import { fetchUnreadCount } from "store/unread-notifications/notifications.actions";
+import OfflineLabel from "components/typography/offline";
 
 interface NotiListProps {
   unread: boolean;
@@ -42,9 +43,6 @@ const useStyles = makeStyles({
   },
   listItemOpaque: {
     opacity: 0.6,
-  },
-  offline: {
-    opacity: 0.5,
   },
   link: {
     textDecoration: "none",
@@ -125,9 +123,7 @@ const NotiList = ({
       })}
     </List>
   ) : (
-    <Box className={classes.offline}>
-      <Typography variant="h4">Not available when offline</Typography>
-    </Box>
+    <OfflineLabel />
   );
 };
 
