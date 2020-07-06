@@ -164,7 +164,7 @@ export const shareTodo = async (req: Request, res: Response) => {
   });
 
   // Create notification document
-  await Notification.build({
+  const notification = await Notification.build({
     sender: req.user.id,
     recipient: userId,
     reason: TodoHistoryReason.shared,
@@ -172,9 +172,7 @@ export const shareTodo = async (req: Request, res: Response) => {
   });
 
   // Webpush
-  const webPushResults = await User.sendNotification(userId, { test: 'test' });
-  console.log('webPushResults', webPushResults);
-
+  await User.sendNotification(userId, notification);
   res.end();
 };
 
