@@ -3,6 +3,8 @@ import mongoose, { Document, MongooseFilterQuery } from 'mongoose';
 import { ProfileDocument, profileSchema } from './Profile';
 import { WebSubscription } from '../interfaces/IWebSubscription';
 import { escapeRegExp } from '../util/regexp';
+import { SendResult, WebPushError } from 'web-push';
+import { sendWebPushNotification } from '../services/webpush';
 
 export enum AuthProviders {
   facebook = 'facebookId',
@@ -28,6 +30,16 @@ export type UserModel = mongoose.Model<UserDocument> & {
   findByExternalId: findByExternalId;
   createUser: createUser;
   getUsers: getUsersType;
+  sendNotification(
+    this: UserModel,
+    userId: string,
+    data: unknown
+  ): Promise<PromiseSettledResult<SendResult>[]>;
+  removeSubscription(
+    this: UserModel,
+    userId: string,
+    endpoint: string
+  ): Promise<void>;
 };
 
 type getUsersType = (
@@ -71,7 +83,9 @@ export const userSchema = new mongoose.Schema(
     twitterId: String,
     googleId: String,
     tokens: Array,
-    webSubscriptions: [],
+    webSubscriptions: [
+      { endpoint: String, keys: { p256dh: String, auth: String } },
+    ],
     refreshToken: String,
     refreshTokenExpiresAt: Date,
     profile: profileSchema,
@@ -165,9 +179,32 @@ const getUsers: getUsersType = async function ({ email }) {
   );
 };
 
+const sendNotification: UserModel['sendNotification'] = async function (
+  userId,
+  data
+) {
+  const user = await this.findById(userId);
+  const subPromises = (user.webSubscriptions || []).map((sub) =>
+    sendWebPushNotification(sub, data)
+  );
+  return Promise.allSettled(subPromises);
+};
+
+const removeSubscription: UserModel['removeSubscription'] = async function (
+  userId,
+  endpoint
+) {
+  return User.updateOne(
+    { _id: userId },
+    { $pull: { webSubscriptions: { endpoint } } }
+  );
+};
+
 userSchema.methods.comparePassword = comparePassword;
 userSchema.statics.findByExternalId = findByExternalId;
 userSchema.statics.createUser = createUser;
 userSchema.statics.getUsers = getUsers;
+userSchema.statics.sendNotification = sendNotification;
+userSchema.statics.removeSubscription = removeSubscription;
 
 export const User = mongoose.model<UserDocument, UserModel>('User', userSchema);

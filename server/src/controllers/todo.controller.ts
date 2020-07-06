@@ -172,11 +172,9 @@ export const shareTodo = async (req: Request, res: Response) => {
   });
 
   // Webpush
-  const userSub = await User.findById(userId);
-  const subPromises = (userSub.webSubscriptions || []).map((sub) =>
-    webpush.sendNotification(sub, JSON.stringify({ test: 'test' }))
-  );
-  await Promise.allSettled(subPromises);
+  const webPushResults = await User.sendNotification(userId, { test: 'test' });
+  console.log('webPushResults', webPushResults);
+
   res.end();
 };
 

@@ -15,6 +15,15 @@ export const setStatusOffline = (): TechActions => ({
   type: techActionTypes.SET_STATUS_OFFLINE,
 });
 
+export const beforeInstallEvent = (): TechActions => ({
+  type: techActionTypes.BEFORE_INSTALL_PROMPT,
+});
+
+export const setUserInstallChoice = (choice: boolean): TechActions => ({
+  type: techActionTypes.USER_INSTALL_CHOICE,
+  payload: { choice },
+});
+
 export const checkConnection = (
   retryAction: () => AppThunk
 ): AppThunk => async (dispatch, getState) => {

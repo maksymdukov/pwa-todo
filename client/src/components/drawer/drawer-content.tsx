@@ -16,6 +16,7 @@ import { getIsAuthenticated } from "store/user/selectors";
 import { DrawerListItem } from "./drawer-list-item";
 import { Link } from "react-router-dom";
 import NotificationsCount from "./notifications-count";
+import NotificationsSwitch from "./notifications-switch";
 
 export type IMenuLink = {
   label: string;
@@ -84,6 +85,7 @@ export const DrawerContent = () => {
             ))}
           </List>
           <Divider />
+          <NotificationsSwitch />
         </>
       )}
       {!isAuth && (
