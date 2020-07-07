@@ -71,7 +71,7 @@ registerRoute(
 // Respond to any navigation route with app shell
 const handler = createHandlerBoundToURL("/index.html");
 const navigationRoute = new NavigationRoute(handler, {
-  denylist: [/^\/_/, /\/[^/?]+\.[^/]+$/],
+  denylist: [/^\/_/, /\/[^/?]+\.[^/]+$/, /^\/api\//],
 });
 
 registerRoute(navigationRoute);
