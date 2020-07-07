@@ -5,6 +5,7 @@ import {
 } from '../config/authentication/token';
 import { User } from '../models/User';
 import { config } from '../config';
+import { isDev } from '../util/env';
 
 export async function generateUserTokens(req: Request, res: Response) {
   const user = req.user;
@@ -17,7 +18,7 @@ export async function generateUserTokens(req: Request, res: Response) {
   res.render('authenticated', {
     accessToken,
     refreshToken,
-    origin: `${config.PUBLIC_URL}/signin`,
+    origin: `${isDev ? 'http://localhost:3000' : config.PUBLIC_URL}/signin`,
   });
 }
 
