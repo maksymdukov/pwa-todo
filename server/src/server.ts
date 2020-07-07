@@ -1,3 +1,4 @@
+import { config } from './config';
 import errorHandler from 'errorhandler';
 import http from 'http';
 import socketio from 'socket.io';
@@ -41,7 +42,7 @@ export const io = socketio(httpServer, {
 
 io.use(
   socketioJWT.authorize({
-    secret: process.env.JWT_SECRET,
+    secret: config.JWT_SECRET,
     handshake: true,
     auth_header_required: true,
   })

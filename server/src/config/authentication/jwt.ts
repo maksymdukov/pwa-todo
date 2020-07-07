@@ -1,12 +1,13 @@
 import passport from 'passport';
 import passportJwt from 'passport-jwt';
 import { User } from '../../models/User';
+import { config } from '..';
 
 const jwtOptions = {
   jwtFromRequest: passportJwt.ExtractJwt.fromAuthHeaderAsBearerToken(),
-  secretOrKey: process.env.JWT_SECRET,
-  issuer: process.env.JWT_ISSUER,
-  audience: process.env.JWT_AUDIENCE
+  secretOrKey: config.JWT_SECRET,
+  issuer: config.JWT_ISSUER,
+  audience: config.JWT_AUDIENCE,
 };
 
 passport.use(

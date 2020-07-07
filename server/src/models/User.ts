@@ -65,7 +65,7 @@ type createUser = (
 
 type comparePasswordFunction = (
   candidatePassword: string,
-  cb: (err: any, isMatch: any) => {}
+  cb: (err: any, isMatch: any) => any
 ) => void;
 
 export interface AuthToken {

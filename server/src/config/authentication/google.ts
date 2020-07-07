@@ -2,16 +2,17 @@ import passport from 'passport';
 import passportGoogle, {
   IOAuth2StrategyOption,
   Profile,
-  VerifyFunction
+  VerifyFunction,
 } from 'passport-google-oauth';
 import { AuthProviders, User } from '../../models/User';
+import { config } from '..';
 
 const opts: IOAuth2StrategyOption = {
-  clientID: process.env.GOOGLE_CLIENT_ID,
-  clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: `${process.env.PUBLIC_URL}/api/v0/auth/google/callback`,
+  clientID: config.GOOGLE_CLIENT_ID,
+  clientSecret: config.GOOGLE_CLIENT_SECRET,
+  callbackURL: `${config.PUBLIC_URL}/api/v0/auth/google/callback`,
   accessType: 'code',
-  prompt: 'select_account'
+  prompt: 'select_account',
 };
 
 passport.use(
@@ -36,7 +37,7 @@ passport.use(
           email: profile.emails[0].value,
           firstName: profile.name.givenName,
           lastName: profile.name.familyName,
-          picture: profile.photos[0].value
+          picture: profile.photos[0].value,
         });
         return done(null, newUser);
       }
@@ -50,10 +51,10 @@ passport.use(
   'google-link',
   new passportGoogle.OAuth2Strategy(
     {
-      clientID: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: `${process.env.PUBLIC_URL}/api/v0/auth/google-link/callback`,
-      accessType: 'code'
+      clientID: config.GOOGLE_CLIENT_ID,
+      clientSecret: config.GOOGLE_CLIENT_SECRET,
+      callbackURL: `${config.PUBLIC_URL}/api/v0/auth/google-link/callback`,
+      accessType: 'code',
     },
     async (
       accessToken: string,

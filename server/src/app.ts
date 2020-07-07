@@ -4,23 +4,23 @@ import bodyParser from 'body-parser';
 import lusca from 'lusca';
 import path from 'path';
 import mongoose from 'mongoose';
-import { MONGODB_URI } from './util/secrets';
 import passport from 'passport';
 import './config/passport';
 import logger from 'morgan';
 
 // Controllers (route handlers)
 import routes from './routes/index';
+import { isProd } from './util/env';
+import { config } from './config';
 
 // Create Express server
 const app = express();
 
 // Connect to MongoDB
-const mongoUrl = MONGODB_URI;
 mongoose.Promise = Promise;
 
 mongoose
-  .connect(mongoUrl, {
+  .connect(config.MONGODB_URI, {
     useNewUrlParser: true,
     useCreateIndex: true,
     useUnifiedTopology: true,
@@ -36,9 +36,7 @@ mongoose
   });
 
 // Express configuration
-app.set('port', process.env.PORT || 3000);
-app.set('views', path.join(__dirname, '../views'));
-app.set('view engine', 'ejs');
+app.set('port', isProd ? config.PORT : 3001);
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -54,5 +52,16 @@ app.use(logger('dev'));
  * routes.
  */
 app.use(routes);
+
+if (isProd) {
+  const buildPath = path.join(__dirname, '..', '..', 'client', 'build');
+  // Serve any static files
+  app.use(express.static(buildPath));
+
+  // Handle React routing, return all requests to React app
+  app.get('*', function (req, res) {
+    res.sendFile(path.join(buildPath, 'index.html'));
+  });
+}
 
 export default app;

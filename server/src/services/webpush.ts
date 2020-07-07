@@ -1,10 +1,11 @@
 import webpush from 'web-push';
 import { WebSubscription } from '../interfaces/IWebSubscription';
+import { config } from '../config';
 
 webpush.setVapidDetails(
-  `mailto:${process.env.VAPID_SUBJECT}`,
-  process.env.VAPID_PUBLIC_KEY,
-  process.env.VAPID_PRIVATE_KEY
+  `mailto:${config.VAPID_SUBJECT}`,
+  config.VAPID_PUBLIC_KEY,
+  config.VAPID_PRIVATE_KEY
 );
 
 export const sendWebPushNotification = (
