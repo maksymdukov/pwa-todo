@@ -14,7 +14,11 @@ const UserAvatar: React.FC<UserAvatarProps> = ({
   fallbackClassname,
 }) => {
   return src ? (
-    <Avatar className={className} src={src} />
+    <Avatar
+      className={className}
+      src={src}
+      imgProps={{ crossOrigin: "anonymous" }}
+    />
   ) : (
     <AccountCircle className={fallbackClassname} />
   );
