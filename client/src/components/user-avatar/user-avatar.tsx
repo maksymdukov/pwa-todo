@@ -1,22 +1,21 @@
 import React from "react";
 import { Avatar } from "@material-ui/core";
-import AccountCircle from "@material-ui/icons/AccountCircle";
 
 interface UserAvatarProps {
   src?: string;
   className?: string;
-  fallbackClassname?: string;
+  alt?: string;
+  imgProps?: React.ImgHTMLAttributes<HTMLImageElement>;
 }
 
 const UserAvatar: React.FC<UserAvatarProps> = ({
   src,
+  alt,
   className,
-  fallbackClassname,
+  imgProps,
 }) => {
-  return src ? (
-    <Avatar className={className} src={src} />
-  ) : (
-    <AccountCircle className={fallbackClassname} />
+  return (
+    <Avatar className={className} src={src} alt={alt} imgProps={imgProps} />
   );
 };
 

@@ -6,7 +6,6 @@ import {
   ListItemSecondaryAction,
   ListItemText,
   Typography,
-  Avatar,
   Box,
 } from "@material-ui/core";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
@@ -17,6 +16,7 @@ import TodoMenu from "../todo-menu/todo-menu";
 import { ITodoListItem } from "models/ITodoListItem";
 import { UserState } from "store/user/reducer";
 import { ConnectionStatus } from "store/tech/tech.reducer";
+import AvatarGroup from "@material-ui/lab/AvatarGroup";
 
 const useStyles = makeStyles((theme) => ({
   item: {
@@ -35,18 +35,9 @@ const useStyles = makeStyles((theme) => ({
     flexGrow: 1,
   },
   itemActions: {},
-  sharedContainer: {
-    "& > :not(:first-child)": {
-      marginLeft: -10,
-    },
-    opacity: 0.8
-  },
   sharedAvatar: {
-    width: "1em",
-    height: "1em",
-  },
-  fallbackSharedAvatar: {
-    color: theme.palette.grey[500],
+    width: "1.5em",
+    height: "1.5em",
   },
 }));
 
@@ -77,28 +68,35 @@ const TodoListItem = (props: TodoListItemProps) => {
   return (
     <ListItem className={classes.item} to={`/todos/${id}`} component={Link}>
       <ListItemAvatar>
-        <UserAvatar src={creator.profile.picture} />
+        <UserAvatar
+          alt={`${creator.profile.firstName} ${creator.profile.lastName}`}
+          imgProps={{
+            title: `${creator.profile.firstName} ${creator.profile.lastName}`,
+          }}
+          src={creator.profile.picture}
+        />
       </ListItemAvatar>
       <ListItemText>
         <div>
+          <Typography variant="h5">{title}</Typography>
           <Typography variant="subtitle2">
             Updated: {new Date(updatedAt).toLocaleString()}
           </Typography>
-          <div>{title}</div>
           {isMyTodo && (
-            <Box
-              display="flex"
-              alignItems="center"
-              className={classes.sharedContainer}
-            >
-              {shared.map((sharedUser) => (
-                <UserAvatar
-                  key={sharedUser.id}
-                  src={sharedUser.profile.picture}
-                  className={classes.sharedAvatar}
-                  fallbackClassname={classes.fallbackSharedAvatar}
-                />
-              ))}
+            <Box>
+              <AvatarGroup max={5}>
+                {shared.map((sharedUser) => (
+                  <UserAvatar
+                    key={sharedUser.id}
+                    src={sharedUser.profile.picture}
+                    alt={`${sharedUser.profile.firstName} ${sharedUser.profile.lastName}`}
+                    className={classes.sharedAvatar}
+                    imgProps={{
+                      title: `${sharedUser.profile.firstName} ${sharedUser.profile.lastName}`,
+                    }}
+                  />
+                ))}
+              </AvatarGroup>
             </Box>
           )}
           {pending && <div style={{ color: "red" }}>pending</div>}
