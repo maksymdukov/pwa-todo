@@ -11,7 +11,7 @@ export type TechStateType = {
   userInstallChoice: boolean | null;
 };
 
-const initialState = {
+const initialState: TechStateType = {
   status: navigator.onLine ? ConnectionStatus.online : ConnectionStatus.offline,
   beforeInstallPrompt: false,
   userInstallChoice: null,

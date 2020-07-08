@@ -12,9 +12,14 @@ module.exports = function override(config, env) {
   });
 
   if (WBindex > -1) {
+    // GenerateSW is found and it means it's production
     config.plugins[WBindex] = WBplugin;
   } else {
-    config.plugins.push(WBplugin);
+    // GenerateSW is not found and it means it's development
+    if (process.env.ENABLE_DEV_SERVICE_WORKER === "true") {
+      // enable service worker in development mode
+      config.plugins.push(WBplugin);
+    }
   }
   return config;
 };

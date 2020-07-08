@@ -6,8 +6,6 @@ import { history } from "providers";
 import { getTodoItems } from "store/todos/todos.selectors";
 import { todosIDB } from "services/todos-idb.service";
 import {
-  setTodoItems,
-  syncTodos,
   syncOutboundRequests,
   updateTodosFromIDB,
 } from "store/todos/todos.actions";
@@ -78,16 +76,16 @@ export const postTodo = ({
 
       // Add request to IDB store outboutTodos
       // Edit todo in IDB store syncTodos
-      // Try to send requests from outboundTodos
       await todosIDB.editTodo(editedTodo);
     }
 
     await dispatch(updateTodosFromIDB());
     history.push("/todos");
 
+    // Try to send requests from outboundTodos
     await dispatch(syncOutboundRequests());
   } catch (e) {
-    console.log(e);
+    console.error(e);
   }
 };
 
@@ -120,9 +118,11 @@ export const setSingleTodo = (todoId: string): AppThunk => async (
 export const deleteTodoAction = (todoId: string): AppThunk => async (
   dispatch
 ) => {
-  await todosIDB.deleteTodo(todoId, Date.now());
-  await dispatch(updateTodosFromIDB());
-  // // start syncing
-  // dispatch(syncTodos());
-  await dispatch(syncOutboundRequests());
+  try {
+    await todosIDB.deleteTodo(todoId, Date.now());
+    await dispatch(updateTodosFromIDB());
+    await dispatch(syncOutboundRequests());
+  } catch (error) {
+    console.error(error);
+  }
 };

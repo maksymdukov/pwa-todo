@@ -9,8 +9,6 @@ import { todosIDB } from "services/todos-idb.service";
 import { checkConnection, runOnlineActions } from "store/tech/tech.actions";
 import { getConnetionStatus } from "store/tech/tech.selectors";
 import { ConnectionStatus } from "store/tech/tech.reducer";
-import { InvalidRefreshToken } from "errors/invalid-refresh-token";
-import { logout } from "store/user/actions";
 import { ErrorCodes } from "errors/error-codes";
 import { SyncStatus } from "./todos.reducer";
 
@@ -102,14 +100,9 @@ export const syncTodos = (): AppThunk => async (dispatch, getState) => {
     dispatch(syncFail());
     console.error(error);
 
-    if (error instanceof InvalidRefreshToken) {
-      // logout
-      dispatch(logout());
-      return;
-    }
-
-    if (error.code === ErrorCodes.AXIOS_CONNECTION_TIMEOUT) {
+    if (error.code === ErrorCodes.ECONNABORTED) {
       // Set status to offline
+      // TODO Can potentially be moved to the base class for GET requests
       dispatch(checkConnection(runOnlineActions));
     }
   }

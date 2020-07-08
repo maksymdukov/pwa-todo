@@ -1,9 +1,12 @@
-import { Method, AxiosRequestConfig, AxiosResponse, AxiosError } from "axios";
+import { Method, AxiosRequestConfig, AxiosResponse } from "axios";
 import { authPersistence, AuthPersistence } from "services/auth-persistence";
 import { config } from "config/config";
 import { AuthData } from "pages/auth/signin/types";
 import { axios } from "libs/axios";
 import { InvalidRefreshToken } from "errors/invalid-refresh-token";
+import { store } from "store/store";
+import { logout } from "store/user/actions";
+import { AuthorizationError } from "errors/authorization-error";
 
 interface RequestOptions {
   url?: string;
@@ -39,23 +42,33 @@ export class Base {
       headers: { ...this._defaultHeaders },
       ...other,
     };
-    if (withAuth) {
-      let auth = this._authStorage.getAndValidateTokens();
-      if (!auth.refreshToken || !auth.accessToken) {
-        // logout user
-        // removeStorage
-        return Promise.reject();
-      }
-      let accessToken = auth.accessToken;
-      if (auth.accessTokenExpired) {
-        const authObject = await this.refreshToken();
-        accessToken = authObject.accessToken;
-      }
+    try {
+      if (withAuth) {
+        let auth = this._authStorage.getAndValidateTokens();
+        if (!auth.refreshToken || !auth.accessToken) {
+          throw new AuthorizationError();
+        }
+        let accessToken = auth.accessToken;
+        if (auth.accessTokenExpired) {
+          const authObject = await this.refreshToken();
+          accessToken = authObject.accessToken;
+        }
 
-      config.headers.Authorization = `Bearer ${accessToken}`;
+        config.headers.Authorization = `Bearer ${accessToken}`;
+      }
+      return axios(config);
+    } catch (e) {
+      if (
+        e instanceof AuthorizationError ||
+        e instanceof InvalidRefreshToken ||
+        e.response?.status === 401
+      ) {
+        // Authorization failed. Logging out...
+        store.dispatch(logout());
+        throw e;
+      }
+      throw e;
     }
-
-    return axios(config);
   }
 
   async refreshToken(): Promise<AuthData> {

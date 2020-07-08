@@ -70,6 +70,6 @@ export const socialLogin = (authData: AuthData): AppThunk => (dispatch) => {
 export const logout = (): AppThunk => async (dispatch) => {
   dispatch(logoutAction());
   await authPersistence.removeAuthData();
+  // remove todos from indexedDB
   await idb.clearAllDBs();
-  // TODO remove todos from indexedDB
 };
