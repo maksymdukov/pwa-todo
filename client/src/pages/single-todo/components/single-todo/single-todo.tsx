@@ -11,6 +11,7 @@ import { postTodo, setSingleTodo, resetTodo } from "store/todo/todo.actions";
 import { getSyncState, getTodoItems } from "store/todos/todos.selectors";
 import { getUserState } from "store/user/selectors";
 import { SyncStatus } from "store/todos/todos.reducer";
+import BackBtn from "components/buttons/back-btn";
 
 type SingleTodoProps = RouteComponentProps<{ id?: string }> & {
   isNew?: boolean;
@@ -77,6 +78,9 @@ const SingleTodo = ({ match, isNew }: SingleTodoProps) => {
 
   return (
     <div className={classes.container}>
+      <div>
+        <BackBtn />
+      </div>
       {isNew && "Create new todo"}
       <TodoHeader setTodo={setTodo} todo={todo} editable={isEditable} />
       <TodoRecords

@@ -3,8 +3,6 @@ import CssBaseline from "@material-ui/core/CssBaseline";
 import { makeStyles } from "@material-ui/core/styles";
 import { NavDrawer } from "components/drawer";
 import { Navbar } from "components/navbar";
-import { Box } from "@material-ui/core";
-import BackBtn from "components/buttons/back-btn";
 
 export const drawerWidth = 240;
 
@@ -39,12 +37,7 @@ export const Layout: FC = ({ children }) => {
       <NavDrawer drawerOpened={mobileOpen} onDrawerOpen={handleDrawerToggle} />
       <main className={classes.content}>
         <div className={classes.toolbar} />
-        <div className={classes.main}>
-          <Box>
-            <BackBtn />
-          </Box>
-          {children}
-        </div>
+        <div className={classes.main}>{children}</div>
       </main>
     </div>
   );
