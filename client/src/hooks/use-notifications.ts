@@ -45,6 +45,7 @@ export const useNotifications = ({
 }) => {
   const [notificationsState, setNotificationsState] = useState({
     switch: false,
+    loading: false,
   });
 
   const handleSwitch = useCallback(async () => {
@@ -52,11 +53,22 @@ export const useNotifications = ({
       // unsubscribe api
       setNotificationsState((prevState) => ({
         ...prevState,
+        loading: true,
+      }));
+
+      await configurePushSub(true);
+
+      setNotificationsState((prevState) => ({
+        ...prevState,
+        loading: false,
         switch: false,
       }));
-      await configurePushSub(true);
     } else {
       // subscribe api
+      setNotificationsState((prevState) => ({
+        ...prevState,
+        loading: true,
+      }));
       const result = await Notification.requestPermission();
       console.log("User Choice", result);
       if (result !== "granted") {
@@ -68,6 +80,10 @@ export const useNotifications = ({
           switch: true,
         }));
       }
+      setNotificationsState((prevState) => ({
+        ...prevState,
+        loading: false,
+      }));
     }
   }, [notificationsState]);
 
@@ -80,10 +96,15 @@ export const useNotifications = ({
         const swReg = await navigator.serviceWorker.ready;
         const subscription = await swReg.pushManager.getSubscription();
         if (subscription) {
+          setNotificationsState((prevState) => ({
+            ...prevState,
+            loading: true,
+          }));
           await usersService.checkPushSubscription(subscription.endpoint);
           setNotificationsState((prevState) => ({
             ...prevState,
             switch: true,
+            loading: false,
           }));
         }
       })();
@@ -94,9 +115,16 @@ export const useNotifications = ({
     () => ({
       checked: notificationsState.switch,
       onChange: handleSwitch,
-      disabled: connectionStatus === ConnectionStatus.offline,
+      disabled:
+        connectionStatus === ConnectionStatus.offline ||
+        notificationsState.loading,
     }),
-    [handleSwitch, notificationsState.switch, connectionStatus]
+    [
+      handleSwitch,
+      notificationsState.switch,
+      connectionStatus,
+      notificationsState.loading,
+    ]
   );
 
   return {

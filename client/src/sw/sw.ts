@@ -54,9 +54,10 @@ registerRoute(
   })
 );
 
-// Chache images
+// Chache local images
 registerRoute(
-  ({ request }) => request.destination === "image",
+  ({ request }) =>
+    request.destination === "image" && request.url.includes(self.location.host),
   new CacheFirst({
     cacheName: "images",
     plugins: [
@@ -65,6 +66,16 @@ registerRoute(
         maxAgeSeconds: 30 * 24 * 60 * 60, // 30 Days
       }),
     ],
+  })
+);
+
+// Chache third-party images
+registerRoute(
+  ({ request }) =>
+    request.destination === "image" &&
+    !request.url.includes(self.location.host),
+  new StaleWhileRevalidate({
+    cacheName: "third-party-images",
   })
 );
 

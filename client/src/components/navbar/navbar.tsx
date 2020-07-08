@@ -19,15 +19,10 @@ import { Link, useHistory } from "react-router-dom";
 import { AccountMenu } from "./account-menu";
 import { getSyncState } from "store/todos/todos.selectors";
 import { syncTodos } from "store/todos/todos.actions";
-import {
-  getConnetionStatus,
-  getInstallEvent,
-  getUserInstallChoice,
-} from "store/tech/tech.selectors";
+import { getConnetionStatus } from "store/tech/tech.selectors";
 import { ConnectionStatus } from "store/tech/tech.reducer";
 import { SyncStatus } from "store/todos/todos.reducer";
-import { deferredPrompt } from "sw/window-events";
-import { setUserInstallChoice } from "store/tech/tech.actions";
+import InstallAppBtn from "./install-app-btn";
 
 const useStyles = makeStyles((theme) => ({
   title: {
@@ -45,6 +40,9 @@ const useStyles = makeStyles((theme) => ({
       display: "none",
     },
   },
+  installIcon: {
+    backgroundColor: theme.palette.common.white,
+  },
 }));
 
 interface NavbarProps {
@@ -54,11 +52,9 @@ interface NavbarProps {
 export const Navbar = ({ onDrawerOpen }: NavbarProps) => {
   const history = useHistory();
   const syncStatus = useSelector(getSyncState);
-  const installEventFired = useSelector(getInstallEvent);
   const isAuth = useSelector(getIsAuthenticated);
   const isAuthenticating = useSelector(getIsAuthenticating);
   const status = useSelector(getConnetionStatus);
-  const userInstallChoice = useSelector(getUserInstallChoice);
   const classes = useStyles();
   const dispatch = useDispatch();
 
@@ -68,20 +64,6 @@ export const Navbar = ({ onDrawerOpen }: NavbarProps) => {
     dispatch(syncTodos());
   };
 
-  const handleInstallClick = () => {
-    if (deferredPrompt.event) {
-      deferredPrompt.event.prompt();
-      deferredPrompt.event.userChoice.then(function (choiceResult: any) {
-        if (choiceResult.outcome === "dismissed") {
-          dispatch(setUserInstallChoice(false));
-          console.log("User cancelled installation");
-        } else {
-          dispatch(setUserInstallChoice(true));
-          console.log("User added to home screen");
-        }
-      });
-    }
-  };
   return (
     <AppBar position="fixed" className={classes.appBar}>
       <Toolbar>
@@ -101,17 +83,9 @@ export const Navbar = ({ onDrawerOpen }: NavbarProps) => {
           className={classes.title}
           onClick={() => history.push("/")}
         >
-          Todo
+          Notes
         </Typography>
-        {installEventFired && !userInstallChoice && (
-          <Button
-            color="secondary"
-            variant="contained"
-            onClick={handleInstallClick}
-          >
-            Install this APP
-          </Button>
-        )}
+        <InstallAppBtn />
         {!isAuth && !isAuthenticating && (
           <Button
             color="inherit"

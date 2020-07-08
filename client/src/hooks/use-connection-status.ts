@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { runOnlineActions, runOfflineActions } from "store/tech/tech.actions";
 
-export const useConnectionStatus = () => {
+export const useConnectionEffect = () => {
   const dispatch = useDispatch();
   useEffect(() => {
     const updateOnlineStatus = () => {

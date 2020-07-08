@@ -3,12 +3,12 @@ import { Route, Switch, Redirect } from "react-router-dom";
 import { Profile } from "pages/profile";
 import Todos from "./pages/todos";
 import Notifications from "pages/notifications";
-import { useConnectionStatus } from "hooks/use-connection-status";
+import { useConnectionEffect } from "hooks/use-connection-status";
 import { useInitTodos } from "hooks/use-init-todos";
 import { useSocketIO } from "hooks/use-socketio";
 
 export const AuthRoutes = () => {
-  useConnectionStatus();
+  useConnectionEffect();
   const { initializeTodos } = useInitTodos();
   const { initSocket, socketRef } = useSocketIO();
   useEffect(() => {
@@ -17,8 +17,6 @@ export const AuthRoutes = () => {
       await initSocket();
     })();
     return () => {
-      console.log("Todos INIT useEffect return, before closing");
-
       // eslint-disable-next-line
       socketRef.current?.close();
     };
