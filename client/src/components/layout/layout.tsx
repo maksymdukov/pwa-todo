@@ -26,15 +26,19 @@ const useStyles = makeStyles((theme) => ({
 export const Layout: FC = ({ children }) => {
   const classes = useStyles();
   const [mobileOpen, setDrawerOpen] = React.useState(false);
-  const handleDrawerToggle = useCallback(() => {
-    setDrawerOpen((prevState) => !prevState);
+  const openDrawer = useCallback(() => {
+    setDrawerOpen(true);
+  }, [setDrawerOpen]);
+
+  const closeDrawer = useCallback(() => {
+    setDrawerOpen(false);
   }, [setDrawerOpen]);
 
   return (
     <div className={classes.root}>
       <CssBaseline />
-      <Navbar toggleDrawer={handleDrawerToggle} />
-      <NavDrawer drawerOpened={mobileOpen} toggleDrawer={handleDrawerToggle} />
+      <Navbar openDrawer={openDrawer} />
+      <NavDrawer drawerOpened={mobileOpen} closeDrawer={closeDrawer} />
       <main className={classes.content}>
         <div className={classes.toolbar} />
         <div className={classes.main}>{children}</div>

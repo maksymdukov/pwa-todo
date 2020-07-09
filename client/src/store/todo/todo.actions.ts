@@ -3,7 +3,6 @@ import { ITodo, ITodoRecord } from "models/ITodo";
 import { AppThunk } from "store/tools";
 import { getUserState } from "store/user/selectors";
 import { history } from "providers";
-import { getTodoItems } from "store/todos/todos.selectors";
 import { todosIDB } from "services/todos-idb.service";
 import {
   syncOutboundRequests,
@@ -93,27 +92,6 @@ export const loadTodo = (todo: ITodo): TodoActions => ({
   type: todoActionTypes.LOAD_TODO,
   payload: { item: todo },
 });
-
-export const setSingleTodo = (todoId: string): AppThunk => async (
-  dispatch,
-  getState
-) => {
-  try {
-    const state = getState();
-    const items = getTodoItems(state);
-    const chosenItem = items.find((todo) => todo.id === todoId);
-    if (chosenItem) {
-      console.log("chosenItem", chosenItem);
-      dispatch(loadTodo(chosenItem));
-    } else {
-      // TODO
-      // error
-      // redirect to /todos
-    }
-  } catch (e) {
-    console.error(e);
-  }
-};
 
 export const deleteTodoAction = (todoId: string): AppThunk => async (
   dispatch

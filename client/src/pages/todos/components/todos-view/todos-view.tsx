@@ -21,11 +21,11 @@ type TodosViewProps = {
 const getPageLabel = (scope: TodosScopes): string => {
   switch (scope) {
     case TodosScopes.all:
-      return "All todos";
+      return "All notes";
     case TodosScopes.my:
-      return "My todos";
+      return "My notes";
     case TodosScopes.shared:
-      return "Todos shared with me";
+      return "Notes shared with me";
     default:
       return "";
   }

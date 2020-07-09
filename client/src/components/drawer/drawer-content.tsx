@@ -71,10 +71,10 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 interface DrawerContentProps {
-  toggleDrawer: () => void;
+  closeDrawer: () => void;
 }
 
-export const DrawerContent = ({ toggleDrawer }: DrawerContentProps) => {
+export const DrawerContent = ({ closeDrawer }: DrawerContentProps) => {
   const isAuth = useSelector(getIsAuthenticated);
   const classes = useStyles();
   return (
@@ -87,7 +87,7 @@ export const DrawerContent = ({ toggleDrawer }: DrawerContentProps) => {
             {links.map((link, index) => (
               <DrawerListItem
                 key={index}
-                toggleDrawer={toggleDrawer}
+                closeDrawer={closeDrawer}
                 {...link}
               />
             ))}

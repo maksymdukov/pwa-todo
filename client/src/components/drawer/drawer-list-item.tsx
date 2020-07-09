@@ -16,7 +16,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 interface DrawerListItemProps extends IMenuLink {
-  toggleDrawer: () => void;
+  closeDrawer: () => void;
 }
 
 export const DrawerListItem = ({
@@ -27,7 +27,7 @@ export const DrawerListItem = ({
   onClick,
   sub,
   afterLabel: AfterLabel,
-  toggleDrawer,
+  closeDrawer,
   highlighted = true,
 }: DrawerListItemProps) => {
   const classes = useStyles();
@@ -37,9 +37,9 @@ export const DrawerListItem = ({
   });
 
   const handleLinkClick = useCallback(() => {
-    toggleDrawer();
+    closeDrawer();
     onClick && onClick();
-  }, [toggleDrawer, onClick]);
+  }, [closeDrawer, onClick]);
 
   return (
     <div>
@@ -71,7 +71,7 @@ export const DrawerListItem = ({
             offset={offset + LINK_OFFSET}
             to={to + route.to}
             sub={route.sub}
-            toggleDrawer={toggleDrawer}
+            closeDrawer={closeDrawer}
           />
         ))}
     </div>

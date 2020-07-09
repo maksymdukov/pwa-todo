@@ -17,10 +17,10 @@ const useStyles = makeStyles((theme) => ({
 
 interface NavDrawerProps {
   drawerOpened: boolean;
-  toggleDrawer: () => void;
+  closeDrawer: () => void;
 }
 
-export const NavDrawer = ({ drawerOpened, toggleDrawer }: NavDrawerProps) => {
+export const NavDrawer = ({ drawerOpened, closeDrawer }: NavDrawerProps) => {
   const classes = useStyles();
 
   return (
@@ -29,7 +29,7 @@ export const NavDrawer = ({ drawerOpened, toggleDrawer }: NavDrawerProps) => {
         <Drawer
           variant="temporary"
           open={drawerOpened}
-          onClose={toggleDrawer}
+          onClose={closeDrawer}
           classes={{
             paper: classes.drawerPaper,
           }}
@@ -37,7 +37,7 @@ export const NavDrawer = ({ drawerOpened, toggleDrawer }: NavDrawerProps) => {
             keepMounted: true, // Better open performance on mobile.
           }}
         >
-          <DrawerContent toggleDrawer={toggleDrawer} />
+          <DrawerContent closeDrawer={closeDrawer} />
         </Drawer>
       </Hidden>
       <Hidden xsDown implementation="css">
@@ -48,7 +48,7 @@ export const NavDrawer = ({ drawerOpened, toggleDrawer }: NavDrawerProps) => {
           variant="permanent"
           open
         >
-          <DrawerContent toggleDrawer={toggleDrawer} />
+          <DrawerContent closeDrawer={closeDrawer} />
         </Drawer>
       </Hidden>
     </nav>

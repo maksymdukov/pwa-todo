@@ -29,6 +29,7 @@ const TodoRecords = ({
   editable,
 }: TodoRecordsProps) => {
   const lastItemRef = useRef<HTMLTextAreaElement>(null);
+  const refs = useRef<{ [key: number]: HTMLTextAreaElement }>({});
   const prevTodos = usePrevious(todoRecords);
 
   const onDragEnd = useCallback(
@@ -62,6 +63,11 @@ const TodoRecords = ({
         changeTodoRecords(
           todoRecords.filter((todo) => todo.id !== todoRecords[idx].id)
         );
+        delete refs.current[idx];
+        // when record is deleted - focus on the next one
+        if (idx !== todoRecords.length - 1) {
+          refs.current[idx + 1].focus();
+        }
       }
     },
     [changeTodoRecords, todoRecords]
@@ -77,7 +83,7 @@ const TodoRecords = ({
   };
 
   useEffect(() => {
-    // TODO when record is deleted - focus on the previos record
+    // When new item is added - focus on the last one
     if (prevTodos.length < todoRecords.length && lastItemRef.current) {
       lastItemRef.current.focus();
       // move caret to the end
@@ -86,6 +92,7 @@ const TodoRecords = ({
       lastItemRef.current.value = val;
     }
   }, [todoRecords, prevTodos]);
+
   return (
     <>
       <DragDropContext onDragEnd={onDragEnd}>
@@ -108,7 +115,8 @@ const TodoRecords = ({
                       )}
                     >
                       <TodoRecord
-                        myRef={lastItemRef}
+                        lastItemRef={lastItemRef}
+                        refs={refs}
                         content={content}
                         index={index}
                         last={index === todoRecords.length - 1}

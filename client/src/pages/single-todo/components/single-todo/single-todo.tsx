@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { RouteComponentProps } from "react-router";
+import { RouteComponentProps, useHistory } from "react-router";
 import TodoHeader from "pages/single-todo/components/todo-header";
 import TodoRecords from "pages/single-todo/components/todo-records";
 import { useStyles } from "./single-todo.styles";
@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getTodoItemState } from "store/todo/todo.selectors";
 import SaveTodoBtn from "./elements/save-todo-btn";
 import { ITodo, ITodoRecord } from "models/ITodo";
-import { postTodo, setSingleTodo, resetTodo } from "store/todo/todo.actions";
+import { postTodo } from "store/todo/todo.actions";
 import { getSyncState, getTodoItems } from "store/todos/todos.selectors";
 import { getUserState } from "store/user/selectors";
 import { SyncStatus } from "store/todos/todos.reducer";
@@ -19,6 +19,7 @@ type SingleTodoProps = RouteComponentProps<{ id?: string }> & {
 
 const SingleTodo = ({ match, isNew }: SingleTodoProps) => {
   const classes = useStyles();
+  const history = useHistory();
   const todoToEdit = useSelector(getTodoItemState);
   const todos = useSelector(getTodoItems);
   const syncStatus = useSelector(getSyncState);
@@ -30,28 +31,40 @@ const SingleTodo = ({ match, isNew }: SingleTodoProps) => {
 
   const isEditable = isNew || userProfile.id === todo.creator.id;
 
-  useEffect(() => {
-    return () => {
-      dispatch(resetTodo());
-    };
-  }, [dispatch]);
+  const setItemToEdit = useCallback(
+    (todoId: string) => {
+      const chosenItem = todos.find((todo) => todo.id === todoId);
+      if (chosenItem) {
+        setTodo(chosenItem);
+      }
+      return !!chosenItem;
+    },
+    [setTodo, todos]
+  );
 
   useEffect(() => {
     if (isNew) {
       return;
     }
-    if (match.params.id && !syncing) {
-      // fetch from DB if not new
-      dispatch(setSingleTodo(match.params.id));
-    } else {
-      // TODO
-      // redirect
-    }
-  }, [isNew, dispatch, match.params.id, syncing, todos]);
 
-  useEffect(() => {
-    setTodo(todoToEdit);
-  }, [setTodo, todoToEdit]);
+    if (match.params.id && !syncing) {
+      if (!setItemToEdit(match.params.id)) {
+        // Can not find note
+        history.push("/todos");
+      }
+    } else {
+      // redirect
+      history.push("/todos");
+    }
+  }, [
+    isNew,
+    dispatch,
+    match.params.id,
+    syncing,
+    todos,
+    setItemToEdit,
+    history,
+  ]);
 
   const changeTodoRecords = useCallback(
     (newRecordsState: ITodoRecord[]) => {
@@ -81,7 +94,7 @@ const SingleTodo = ({ match, isNew }: SingleTodoProps) => {
       <div>
         <BackBtn />
       </div>
-      {isNew && "Create new todo"}
+      {isNew && "Create new note"}
       <TodoHeader setTodo={setTodo} todo={todo} editable={isEditable} />
       <TodoRecords
         editable={isEditable}

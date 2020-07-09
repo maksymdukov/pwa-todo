@@ -19,14 +19,16 @@ interface TodoRecordProps {
   content: string;
   index: number;
   last: boolean;
-  myRef: MutableRefObject<HTMLTextAreaElement | null>;
+  lastItemRef: MutableRefObject<HTMLTextAreaElement | null>;
+  refs: MutableRefObject<{ [key: number]: HTMLTextAreaElement }>;
   onContentChange: (idx: number, value: string) => void;
   dragProps?: DraggableProvidedDragHandleProps;
   editable: boolean;
 }
 
 const TodoRecord = ({
-  myRef,
+  lastItemRef,
+  refs,
   last,
   content,
   index,
@@ -44,8 +46,9 @@ const TodoRecord = ({
         <TextField
           disabled={!editable}
           inputRef={(r: HTMLTextAreaElement) => {
+            refs.current[index] = r;
             if (last) {
-              myRef.current = r;
+              lastItemRef.current = r;
             }
           }}
           multiline
