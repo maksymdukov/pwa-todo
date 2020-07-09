@@ -3,24 +3,24 @@ import { Hidden, Drawer, makeStyles } from "@material-ui/core";
 import { drawerWidth } from "components/layout/layout";
 import { DrawerContent } from "./drawer-content";
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   drawer: {
     [theme.breakpoints.up("sm")]: {
       width: drawerWidth,
-      flexShrink: 0
-    }
+      flexShrink: 0,
+    },
   },
   drawerPaper: {
-    width: drawerWidth
-  }
+    width: drawerWidth,
+  },
 }));
 
 interface NavDrawerProps {
   drawerOpened: boolean;
-  onDrawerOpen: (event: {}, reason: string) => void;
+  toggleDrawer: () => void;
 }
 
-export const NavDrawer = ({ drawerOpened, onDrawerOpen }: NavDrawerProps) => {
+export const NavDrawer = ({ drawerOpened, toggleDrawer }: NavDrawerProps) => {
   const classes = useStyles();
 
   return (
@@ -29,26 +29,26 @@ export const NavDrawer = ({ drawerOpened, onDrawerOpen }: NavDrawerProps) => {
         <Drawer
           variant="temporary"
           open={drawerOpened}
-          onClose={onDrawerOpen}
+          onClose={toggleDrawer}
           classes={{
-            paper: classes.drawerPaper
+            paper: classes.drawerPaper,
           }}
           ModalProps={{
-            keepMounted: true // Better open performance on mobile.
+            keepMounted: true, // Better open performance on mobile.
           }}
         >
-          <DrawerContent />
+          <DrawerContent toggleDrawer={toggleDrawer} />
         </Drawer>
       </Hidden>
       <Hidden xsDown implementation="css">
         <Drawer
           classes={{
-            paper: classes.drawerPaper
+            paper: classes.drawerPaper,
           }}
           variant="permanent"
           open
         >
-          <DrawerContent />
+          <DrawerContent toggleDrawer={toggleDrawer} />
         </Drawer>
       </Hidden>
     </nav>

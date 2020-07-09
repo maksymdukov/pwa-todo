@@ -46,10 +46,10 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 interface NavbarProps {
-  onDrawerOpen: () => void;
+  toggleDrawer: () => void;
 }
 
-export const Navbar = ({ onDrawerOpen }: NavbarProps) => {
+export const Navbar = ({ toggleDrawer }: NavbarProps) => {
   const history = useHistory();
   const syncStatus = useSelector(getSyncState);
   const isAuth = useSelector(getIsAuthenticated);
@@ -71,7 +71,7 @@ export const Navbar = ({ onDrawerOpen }: NavbarProps) => {
           color="inherit"
           aria-label="open drawer"
           edge="start"
-          onClick={onDrawerOpen}
+          onClick={toggleDrawer}
           className={classes.menuButton}
         >
           <MenuIcon />

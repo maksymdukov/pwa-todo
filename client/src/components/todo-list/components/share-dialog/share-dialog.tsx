@@ -25,7 +25,7 @@ interface ShareDialogProps {
   todo: ITodo;
 }
 
-const useStyles = makeStyles({
+const useStyles = makeStyles(({ palette, breakpoints }) => ({
   listItem: {
     "&:hover": {
       "& $removeIcon": {
@@ -34,14 +34,19 @@ const useStyles = makeStyles({
     },
   },
   removeIcon: {
-    visibility: "hidden",
     color: "red",
+    [breakpoints.up("sm")]: {
+      visibility: "hidden",
+    },
+  },
+  avatarItem: {
+    minWidth: "2rem",
   },
   avatar: {
-    backgroundColor: blue[100],
-    color: blue[600],
+    width: "1.5rem",
+    height: "1.5rem",
   },
-});
+}));
 
 const ShareDialog = ({ closeDialog, dialogOpened, todo }: ShareDialogProps) => {
   const classes = useStyles();
@@ -67,13 +72,20 @@ const ShareDialog = ({ closeDialog, dialogOpened, todo }: ShareDialogProps) => {
             key={person.email}
             className={classes.listItem}
           >
-            <ListItemAvatar>
-              <UserAvatar src={person.profile.picture} />
+            <ListItemAvatar className={classes.avatarItem}>
+              <UserAvatar
+                className={classes.avatar}
+                src={person.profile.picture}
+              />
             </ListItemAvatar>
-            <ListItemText primary={person.email} />
+            <ListItemText
+              primary={person.email}
+              primaryTypographyProps={{ variant: "body2" }}
+            />
             <RemoveCircleIcon className={classes.removeIcon} />
           </ListItem>
         ))}
+        {!sharedUsers.length && <ListItem disabled={true}>None</ListItem>}
         <ListSubheader>Share:</ListSubheader>
         <UserAutocomplete todo={todo} onSharedSuccess={onSuccessfulShare} />
       </List>

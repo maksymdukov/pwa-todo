@@ -35,9 +35,6 @@ export const UserAutocomplete = ({
   const [options, setOptions] = useState<ISharedUser[]>([]);
   const [loading, setLoading] = useState(false);
 
-  console.log("value", value);
-  console.log("inputValue", inputValue);
-
   React.useEffect(() => {
     if (!open) {
       return undefined;
@@ -55,6 +52,7 @@ export const UserAutocomplete = ({
           );
           setOptions(users);
         } catch (error) {
+          console.error(error);
         } finally {
           setLoading(false);
         }
@@ -65,6 +63,9 @@ export const UserAutocomplete = ({
     fetchUsers();
 
     return () => {
+      if (open!) {
+        return;
+      }
       fetchUsers.cancel();
       source.cancel();
       setLoading(false);
@@ -102,6 +103,7 @@ export const UserAutocomplete = ({
         }}
         onOpen={() => {
           setOpen(true);
+          setLoading(true);
         }}
         onClose={() => {
           setOpen(false);

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { ListItem, ListItemIcon, ListItemText } from "@material-ui/core";
 import { NavLink, useRouteMatch } from "react-router-dom";
 import { IMenuLink } from "./drawer-content";
@@ -15,6 +15,10 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+interface DrawerListItemProps extends IMenuLink {
+  toggleDrawer: () => void;
+}
+
 export const DrawerListItem = ({
   offset = 0,
   to,
@@ -23,19 +27,25 @@ export const DrawerListItem = ({
   onClick,
   sub,
   afterLabel: AfterLabel,
+  toggleDrawer,
   highlighted = true,
-}: IMenuLink) => {
+}: DrawerListItemProps) => {
   const classes = useStyles();
   const match = useRouteMatch({
     path: to,
     exact: true,
   });
 
+  const handleLinkClick = useCallback(() => {
+    toggleDrawer();
+    onClick && onClick();
+  }, [toggleDrawer, onClick]);
+
   return (
     <div>
       <ListItem
         className={classes.listItem}
-        onClick={onClick}
+        onClick={handleLinkClick}
         component={NavLink}
         to={to}
         button
@@ -61,6 +71,7 @@ export const DrawerListItem = ({
             offset={offset + LINK_OFFSET}
             to={to + route.to}
             sub={route.sub}
+            toggleDrawer={toggleDrawer}
           />
         ))}
     </div>

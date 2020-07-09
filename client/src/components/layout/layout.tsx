@@ -1,4 +1,4 @@
-import React, { FC } from "react";
+import React, { FC, useCallback } from "react";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import { makeStyles } from "@material-ui/core/styles";
 import { NavDrawer } from "components/drawer";
@@ -25,16 +25,16 @@ const useStyles = makeStyles((theme) => ({
 
 export const Layout: FC = ({ children }) => {
   const classes = useStyles();
-  const [mobileOpen, setMobileOpen] = React.useState(false);
-  const handleDrawerToggle = () => {
-    setMobileOpen(!mobileOpen);
-  };
+  const [mobileOpen, setDrawerOpen] = React.useState(false);
+  const handleDrawerToggle = useCallback(() => {
+    setDrawerOpen((prevState) => !prevState);
+  }, [setDrawerOpen]);
 
   return (
     <div className={classes.root}>
       <CssBaseline />
-      <Navbar onDrawerOpen={handleDrawerToggle} />
-      <NavDrawer drawerOpened={mobileOpen} onDrawerOpen={handleDrawerToggle} />
+      <Navbar toggleDrawer={handleDrawerToggle} />
+      <NavDrawer drawerOpened={mobileOpen} toggleDrawer={handleDrawerToggle} />
       <main className={classes.content}>
         <div className={classes.toolbar} />
         <div className={classes.main}>{children}</div>
