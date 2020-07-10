@@ -6,11 +6,14 @@ import Notifications from "pages/notifications";
 import { useConnectionEffect } from "hooks/use-connection-status";
 import { useInitTodos } from "hooks/use-init-todos";
 import { useSocketIO } from "hooks/use-socketio";
+import { useServiceWorkerEvents } from "hooks/use-service-worker-events";
 
 export const AuthRoutes = () => {
   useConnectionEffect();
+  useServiceWorkerEvents();
   const { initializeTodos } = useInitTodos();
   const { initSocket, socketRef } = useSocketIO();
+
   useEffect(() => {
     (async () => {
       await initializeTodos();
@@ -21,6 +24,7 @@ export const AuthRoutes = () => {
       socketRef.current?.close();
     };
   }, [initializeTodos, initSocket, socketRef]);
+
   return (
     <Switch>
       <Route path="/todos" component={Todos} />

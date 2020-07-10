@@ -8,6 +8,7 @@ import { CacheableResponsePlugin } from "workbox-cacheable-response";
 import { ExpirationPlugin } from "workbox-expiration";
 import { INotification } from "models/INotification";
 import { TodoHistoryReason } from "models/TodoHistoryReason";
+import { SWEventTypes } from "models/sw-event-types";
 
 declare global {
   interface ServiceWorkerGlobalScope {
@@ -19,8 +20,10 @@ declare var self: ServiceWorkerGlobalScope;
 export default null;
 
 self.addEventListener("message", (event) => {
-  if (event.data && event.data.type === "SKIP_WAITING") {
-    self.skipWaiting();
+  if (event.data && event.data.type === SWEventTypes.SKIP_WAITING) {
+    self.skipWaiting().then((res) => {
+      console.log("skipWaiting resolved", res);
+    });
   }
 });
 
@@ -90,7 +93,9 @@ registerRoute(navigationRoute);
 // Handle web push notification
 self.addEventListener("push", (event) => {
   console.log("Push Notification received", event);
+
   const data = event.data?.json() as INotification;
+
   if (data.reason === TodoHistoryReason.shared) {
     event.waitUntil(
       self.registration.showNotification(`You've got new shared note`, {
@@ -111,7 +116,6 @@ self.addEventListener("notificationclose", function (event) {
 self.addEventListener("notificationclick", function (event) {
   var notification = event.notification;
   var action = event.action;
-
   console.log(action);
 
   event.waitUntil(

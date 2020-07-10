@@ -27,6 +27,7 @@
     "idb": "^5.0.4",
     "jwt-decode": "^2.2.0",
     "lodash": "^4.17.15",
+    "notistack": "^0.9.17",
     "react": "^16.13.1",
     "react-app-rewired": "^2.1.6",
     "react-beautiful-dnd": "^13.0.0",

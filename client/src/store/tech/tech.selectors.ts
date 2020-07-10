@@ -17,3 +17,13 @@ export const getUserInstallChoice = createSelector(
   getTechState,
   ({ userInstallChoice }) => userInstallChoice
 );
+
+export const getIsReadyForOffline = createSelector(
+  getTechState,
+  ({ readyForOffline }) => readyForOffline
+);
+
+export const getIsNewVersionAvailable = createSelector(
+  getTechState,
+  ({ newVersionAvailable }) => newVersionAvailable
+);

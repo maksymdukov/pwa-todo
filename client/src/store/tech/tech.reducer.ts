@@ -9,12 +9,16 @@ export type TechStateType = {
   status: ConnectionStatus;
   beforeInstallPrompt: boolean;
   userInstallChoice: boolean | null;
+  readyForOffline: boolean;
+  newVersionAvailable: boolean;
 };
 
 const initialState: TechStateType = {
   status: navigator.onLine ? ConnectionStatus.online : ConnectionStatus.offline,
   beforeInstallPrompt: false,
   userInstallChoice: null,
+  readyForOffline: false,
+  newVersionAvailable: false,
 };
 
 export const techReducer = (
@@ -30,6 +34,10 @@ export const techReducer = (
       return { ...state, beforeInstallPrompt: true };
     case techActionTypes.USER_INSTALL_CHOICE:
       return { ...state, userInstallChoice: action.payload.choice };
+    case techActionTypes.NEW_VERSION_AVAILABLE:
+      return { ...state, newVersionAvailable: true };
+    case techActionTypes.READY_FOR_OFFLINE:
+      return { ...state, readyForOffline: true };
     default:
       return state;
   }

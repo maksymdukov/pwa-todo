@@ -24,6 +24,14 @@ export const setUserInstallChoice = (choice: boolean): TechActions => ({
   payload: { choice },
 });
 
+export const setReadyForOffline = (): TechActions => ({
+  type: techActionTypes.READY_FOR_OFFLINE,
+});
+
+export const setNewVersionAvailable = (): TechActions => ({
+  type: techActionTypes.NEW_VERSION_AVAILABLE,
+});
+
 export const checkConnection = (
   retryAction: () => AppThunk
 ): AppThunk => async (dispatch, getState) => {

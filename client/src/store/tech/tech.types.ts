@@ -3,6 +3,8 @@ export enum techActionTypes {
   SET_STATUS_OFFLINE = "SET_STATUS_OFFLINE",
   BEFORE_INSTALL_PROMPT = "BEFORE_INSTALL_PROMPT",
   USER_INSTALL_CHOICE = "USER_INSTALL_CHOICE",
+  READY_FOR_OFFLINE = "READY_FOR_OFFLINE",
+  NEW_VERSION_AVAILABLE = "NEW_VERSION_AVAILABLE",
 }
 
 export interface SetStatusOnline {
@@ -22,8 +24,18 @@ export interface UserInstallChoice {
   payload: { choice: boolean };
 }
 
+export interface ReadyForOffline {
+  type: techActionTypes.READY_FOR_OFFLINE;
+}
+
+export interface NewVersionAvailable {
+  type: techActionTypes.NEW_VERSION_AVAILABLE;
+}
+
 export type TechActions =
   | SetStatusOnline
   | SetStatusOffline
   | BeforeInstallPropmt
-  | UserInstallChoice;
+  | UserInstallChoice
+  | ReadyForOffline
+  | NewVersionAvailable;
