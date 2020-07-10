@@ -20,11 +20,8 @@ declare var self: ServiceWorkerGlobalScope;
 export default null;
 
 self.addEventListener("message", (event) => {
-  console.log("prodtest");
   if (event.data && event.data.type === SWEventTypes.SKIP_WAITING) {
-    self.skipWaiting().then((res) => {
-      console.log("skipWaiting resolved", res);
-    });
+    self.skipWaiting();
   }
 });
 

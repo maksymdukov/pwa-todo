@@ -16,12 +16,22 @@ export const useServiceWorkerEvents = () => {
   const isAuth = useSelector(getIsAuthenticated);
 
   const handleAppUpdate: ReactEventHandler<HTMLButtonElement> = useCallback(
-    (e) => {
+    async (e) => {
       e.preventDefault();
-      navigator.serviceWorker.controller?.postMessage({
-        type: SWEventTypes.SKIP_WAITING,
+      const regs = await navigator.serviceWorker.getRegistrations();
+      regs.forEach((reg) => {
+        if (reg.waiting) {
+          reg.waiting.addEventListener("statechange", (e) => {
+            if (reg.active) {
+              // reload page once new SW is active
+              window.location.reload();
+            }
+          });
+          reg.waiting.postMessage({
+            type: SWEventTypes.SKIP_WAITING,
+          });
+        }
       });
-      // window.location.reload();
     },
     []
   );
@@ -37,8 +47,8 @@ export const useServiceWorkerEvents = () => {
       enqueueSnackbar(
         <div>
           New app verison is available.{" "}
-          <button onClick={handleAppUpdate}>Click</button> to update and reload
-          page.
+          <button onClick={handleAppUpdate}>Click</button> to update app and
+          reload page.
         </div>,
         { variant: "info", autoHideDuration: 8000 }
       );
