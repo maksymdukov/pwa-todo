@@ -6,14 +6,12 @@ import {
 } from "store/tech/tech.selectors";
 import { useEffect } from "react";
 import { useSnackbar } from "notistack";
-import { getIsAuthenticated } from "store/user/selectors";
 import { SWEventTypes } from "models/sw-event-types";
 
 export const useServiceWorkerEvents = () => {
   const { enqueueSnackbar } = useSnackbar();
   const readyForOffline = useSelector(getIsReadyForOffline);
   const newVersionAvailable = useSelector(getIsNewVersionAvailable);
-  const isAuth = useSelector(getIsAuthenticated);
 
   const handleAppUpdate: ReactEventHandler<HTMLButtonElement> = useCallback(
     async (e) => {
@@ -37,13 +35,13 @@ export const useServiceWorkerEvents = () => {
   );
 
   useEffect(() => {
-    if (readyForOffline && isAuth) {
+    if (readyForOffline) {
       enqueueSnackbar("Ready for offline use", { variant: "info" });
     }
-  }, [readyForOffline, enqueueSnackbar, isAuth]);
+  }, [readyForOffline, enqueueSnackbar]);
 
   useEffect(() => {
-    if (newVersionAvailable && isAuth) {
+    if (newVersionAvailable) {
       enqueueSnackbar(
         <div>
           New app verison is available.{" "}
@@ -53,5 +51,5 @@ export const useServiceWorkerEvents = () => {
         { variant: "info", autoHideDuration: 8000 }
       );
     }
-  }, [newVersionAvailable, enqueueSnackbar, isAuth, handleAppUpdate]);
+  }, [newVersionAvailable, enqueueSnackbar, handleAppUpdate]);
 };
