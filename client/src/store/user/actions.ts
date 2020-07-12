@@ -57,7 +57,7 @@ export const login = ({
   return;
 };
 
-export const socialLogin = (authData: AuthData): AppThunk => (dispatch) => {
+export const doLogin = (authData: AuthData): AppThunk => (dispatch) => {
   authPersistence.storeAuthData(authData);
   console.log("jwtDecode", jwtDecode(authData.accessToken));
 

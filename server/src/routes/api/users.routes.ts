@@ -6,6 +6,7 @@ import {
   getProfile,
   removeWebPushSubscription,
   checkWebPushSubscription,
+  changePassword,
 } from '../../controllers/users.controller';
 import { body, query } from 'express-validator';
 import { validateInput } from '../../middlewares/validate-input';
@@ -16,6 +17,12 @@ usersRouter.use(isAuthenticated);
 
 usersRouter.get('/', getUsers);
 usersRouter.get('/profile', getProfile);
+usersRouter.post(
+  'changepassword',
+  [body('newPassword').isLength({ min: 8 })],
+  validateInput,
+  changePassword
+);
 
 usersRouter.get(
   '/webpush',

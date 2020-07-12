@@ -33,8 +33,16 @@ if (passportConfig.clientID) {
       );
       console.log('possibleUser', possibleUser);
       if (!possibleUser) {
-        // TODO
         // check if email is already registered
+        if (profile.emails && profile.emails.length) {
+          const userByEmail = await User.findByEmail(profile.emails[0].value);
+          if (userByEmail) {
+            return done(null, false, {
+              message:
+                'User with this email already exist. Login using it and link account',
+            });
+          }
+        }
         // create user
         const newUser = await User.createUser(AuthProviders.facebook, {
           id: profile.id,

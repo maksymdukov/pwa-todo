@@ -1,6 +1,5 @@
 import jwtDecode from "jwt-decode";
 import { AuthData } from "pages/auth/signin/types";
-import { UserProfile } from "store/user/reducer";
 
 interface Storage {
   getItem: (key: string) => string | null;
@@ -55,7 +54,7 @@ export class AuthPersistence {
 
   getAndValidateTokens(): { accessTokenExpired: boolean } & Partial<AuthData> {
     const result = {
-      accessTokenExpired: true
+      accessTokenExpired: true,
     };
     const authObject = this.getAuthObject();
     if (!authObject) return result;

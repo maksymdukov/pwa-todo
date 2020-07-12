@@ -14,6 +14,14 @@ export class UsersService extends Base {
     });
   }
 
+  async changePassword(data: { newPassword: string }) {
+    return this.request({
+      method: "POST",
+      url: "changepassword",
+      data,
+    });
+  }
+
   async checkPushSubscription(endpoint: string) {
     return this.request({
       method: "GET",

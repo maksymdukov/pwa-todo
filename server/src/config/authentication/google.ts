@@ -29,8 +29,14 @@ passport.use(
         profile.id
       );
       if (!possibleUser) {
-        // TODO
         // check if email is already registered
+        const userByEmail = await User.findByEmail(profile.emails[0].value);
+        if (userByEmail) {
+          return done(null, false, {
+            message:
+              'User with this email already exist. Login using it and link account',
+          });
+        }
         // create user
         const newUser = await User.createUser(AuthProviders.google, {
           id: profile.id,

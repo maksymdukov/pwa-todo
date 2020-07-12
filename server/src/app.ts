@@ -1,4 +1,5 @@
 import express from 'express';
+import 'express-async-errors';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import lusca from 'lusca';
@@ -12,6 +13,7 @@ import logger from 'morgan';
 import routes from './routes/index';
 import { isProd } from './util/env';
 import { config } from './config';
+import { errorHandler } from './middlewares/error-handler';
 
 // Create Express server
 const app = express();
@@ -66,5 +68,7 @@ if (isProd) {
     res.sendFile(path.join(buildPath, 'index.html'));
   });
 }
+
+app.use(errorHandler);
 
 export default app;

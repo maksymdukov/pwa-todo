@@ -17,8 +17,11 @@ export const config: { [k: string]: string } = {
   FACEBOOK_CLIENT_ID: process.env.FACEBOOK_CLIENT_ID,
   FACEBOOK_CLIENT_SECRET: process.env.FACEBOOK_CLIENT_SECRET,
   PUBLIC_URL: process.env.PUBLIC_URL,
+  CLIENT_PUBLIC_URL: process.env.CLIENT_PUBLIC_URL,
   GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
+  MAIL_USER: process.env.MAIL_USER,
+  MAIL_PASSWORD: process.env.MAIL_PASSWORD,
 };
 
 const exceptions = ['PORT'];

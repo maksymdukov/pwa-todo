@@ -9,38 +9,30 @@ import Socials from "pages/auth/signin/components/socials";
 import { ThunkDispatch } from "redux-thunk";
 import { AppState } from "store/store";
 import { UserActions } from "store/user/types";
+import { Link } from "react-router-dom";
 
-const useStyles = makeStyles(theme => ({
+export const useLoginStyles = makeStyles((theme) => ({
   sectionLayout: {
     flexGrow: 1,
     display: "flex",
     justifyContent: "center",
-    alignItems: "center"
+    alignItems: "center",
   },
   login: {
     width: "80%",
     [theme.breakpoints.up("sm")]: {
-      width: "70%"
+      width: "70%",
     },
     [theme.breakpoints.up("md")]: {
-      width: "50%"
+      width: "50%",
     },
     [theme.breakpoints.up("lg")]: {
-      width: 500
-    }
+      width: 500,
+    },
   },
-  social: {
-    marginTop: theme.spacing(),
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center"
+  switch: {
+    marginTop: theme.spacing(2),
   },
-  socialIndent: {
-    "& > *": {
-      marginBottom: theme.spacing()
-    }
-  }
 }));
 
 export interface FormValues {
@@ -49,12 +41,12 @@ export interface FormValues {
 }
 
 export const SignIn = (props: RouteComponentProps) => {
-  const classes = useStyles();
+  const classes = useLoginStyles();
   const history = useHistory();
   const dispatch = useDispatch<ThunkDispatch<AppState, void, UserActions>>();
   const initValues: FormValues = {
     email: "",
-    password: ""
+    password: "",
   };
   const onSumbmit = (
     values: FormValues,
@@ -63,7 +55,7 @@ export const SignIn = (props: RouteComponentProps) => {
     dispatch(
       login({
         email: "test@test.com",
-        password: "password"
+        password: "password",
       })
     )
       .then(() => {
@@ -81,10 +73,9 @@ export const SignIn = (props: RouteComponentProps) => {
           onSubmit={onSumbmit}
           component={SignInForm}
         />
-        <section className={classes.social}>
-          <div className={classes.socialIndent}>
-            <Socials />
-          </div>
+        <Socials />
+        <section className={classes.switch}>
+          No account yet? <Link to="/signup">Create account</Link>
         </section>
       </section>
     </div>

@@ -21,7 +21,7 @@ const httpServer = http.createServer(app);
 /**
  * Error Handler. Provides full stack - remove for production
  */
-app.use(errorHandler());
+// app.use(errorHandler());
 
 export const io = socketio(httpServer, {
   pingTimeout: 3000,

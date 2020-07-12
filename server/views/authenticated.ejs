@@ -1,14 +1,22 @@
 <!DOCTYPE html>
 <html>
-<head>
+  <head>
     <title>Authenticated</title>
-</head>
-<body>
-Authenticated successfully.
-<script type="text/javascript">
-        window.opener.postMessage(JSON.stringify({accessToken: '<%= accessToken %>', refreshToken: '<%= refreshToken %>'}), '<%= origin %>');
-        window.close();
-</script>
-</body>
-
+  </head>
+  <body>
+    Authenticated successfully.
+    <script type="text/javascript">
+      window.opener.postMessage(
+        JSON.stringify({
+          accessToken: '<%= accessToken %>',
+          refreshToken: '<%= refreshToken %>',
+          <% if (error) { %>
+            error: '<%= error %>'
+          <% } %>
+        }),
+        '<%= origin %>'
+      );
+      window.close();
+    </script>
+  </body>
 </html>

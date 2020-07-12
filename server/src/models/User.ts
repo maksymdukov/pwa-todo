@@ -1,35 +1,71 @@
-import bcrypt from 'bcrypt-nodejs';
+import bcrypt from 'bcrypt';
 import mongoose, { Document, MongooseFilterQuery } from 'mongoose';
 import { ProfileDocument, profileSchema } from './Profile';
 import { WebSubscription } from '../interfaces/IWebSubscription';
 import { escapeRegExp } from '../util/regexp';
 import { SendResult, WebPushError } from 'web-push';
 import { sendWebPushNotification } from '../services/webpush';
+import {
+  generateAccessToken,
+  generateRefreshToken,
+} from '../config/authentication/token';
+import { randomBytes } from 'crypto';
 
 export enum AuthProviders {
+  email = 'email',
   facebook = 'facebookId',
   google = 'googleId',
 }
 
+const EMAIL_ACTIVATION_EXPIRATION = 1000 * 3600 * 30; // 30 hours
+
 export type UserDocument = mongoose.Document & {
   email: string;
-  password: string;
-  passwordResetToken: string;
-  passwordResetExpires: Date;
-  facebookId: string;
-  googleId: string;
+  activated: boolean;
+  emailActivationToken?: string;
+  emailActivationExpires?: Date;
+  password?: string;
+  passwordResetToken?: string;
+  passwordResetExpires?: Date;
+  facebookId?: string;
+  googleId?: string;
+  linked: {
+    googleId?: string;
+    googleEmail?: string;
+    facebookId?: string;
+    facebookEmail?: string;
+  };
   tokens: AuthToken[];
   webSubscriptions: WebSubscription[];
   refreshToken: string;
   refreshTokenExpiresAt: Date;
   profile: ProfileDocument;
-  comparePassword: comparePasswordFunction;
+  comparePassword: (candidatePassword: string) => Promise<boolean>;
+  generateAuthTokens(
+    this: UserDocument
+  ): Promise<{ accessToken: string; refreshToken: string }>;
 };
 
 export type UserModel = mongoose.Model<UserDocument> & {
-  findByExternalId: findByExternalId;
-  createUser: createUser;
-  getUsers: getUsersType;
+  findByExternalId: (
+    provider: AuthProviders,
+    id: string
+  ) => Promise<UserDocument | null>;
+  createUser: (
+    provider: AuthProviders,
+    newUser: {
+      id?: string;
+      password?: string;
+      email: string;
+      firstName: string;
+      lastName: string;
+      picture?: string;
+    }
+  ) => Promise<UserDocument | null>;
+  getUsers: (
+    this: UserModel,
+    attrs: { email?: string }
+  ) => Promise<Pick<UserDocument, 'email' | 'profile' | 'id'>[]>;
   sendNotification(
     this: UserModel,
     userId: string,
@@ -40,33 +76,8 @@ export type UserModel = mongoose.Model<UserDocument> & {
     userId: string,
     endpoint: string
   ): Promise<void>;
+  findByEmail(this: UserModel, email: string): Promise<UserDocument | null>;
 };
-
-type getUsersType = (
-  this: UserModel,
-  attrs: { email?: string }
-) => Promise<Pick<UserDocument, 'email' | 'profile' | 'id'>[]>;
-
-type findByExternalId = (
-  provider: AuthProviders,
-  id: string
-) => Promise<UserDocument | null>;
-
-type createUser = (
-  provider: AuthProviders,
-  newUser: {
-    id: string;
-    email: string;
-    firstName: string;
-    lastName: string;
-    picture: string;
-  }
-) => Promise<UserDocument | null>;
-
-type comparePasswordFunction = (
-  candidatePassword: string,
-  cb: (err: any, isMatch: any) => any
-) => void;
 
 export interface AuthToken {
   accessToken: string;
@@ -76,12 +87,22 @@ export interface AuthToken {
 export const userSchema = new mongoose.Schema(
   {
     email: { type: String, unique: true },
+    activated: { type: Boolean, required: true, default: false },
+    emailActivationToken: String,
+    emailActivationExpires: Date,
     password: String,
     passwordResetToken: String,
     passwordResetExpires: Date,
     facebookId: String,
-    twitterId: String,
     googleId: String,
+    linked: {
+      type: {
+        googleId: String,
+        googleEmail: String,
+        facebookId: String,
+        facebookEmail: String,
+      },
+    },
     tokens: Array,
     webSubscriptions: [
       { endpoint: String, keys: { p256dh: String, auth: String } },
@@ -104,64 +125,80 @@ userSchema.set('toJSON', {
 /**
  * Password hash middleware.
  */
-userSchema.pre('save', function save(next) {
+userSchema.pre('save', async function save(next) {
   const user = this as UserDocument;
   if (!user.isModified('password')) {
     return next();
   }
-  bcrypt.genSalt(10, (err, salt) => {
-    if (err) {
-      return next(err);
-    }
-    bcrypt.hash(user.password, salt, undefined, (err: mongoose.Error, hash) => {
-      if (err) {
-        return next(err);
-      }
-      user.password = hash;
-      next();
-    });
-  });
+  try {
+    const hash = await bcrypt.hash(user.password, 8);
+    user.password = hash;
+    next();
+  } catch (error) {
+    next(error);
+  }
 });
 
-const comparePassword: comparePasswordFunction = function (
-  candidatePassword,
-  cb
+const comparePassword: UserDocument['comparePassword'] = async function (
+  candidatePassword
 ) {
-  bcrypt.compare(
-    candidatePassword,
-    this.password,
-    (err: mongoose.Error, isMatch: boolean) => {
-      cb(err, isMatch);
-    }
-  );
+  return bcrypt.compare(candidatePassword, this.password);
 };
 
-const findByExternalId: findByExternalId = async function (provider, id) {
-  return this.findOne({ [provider]: id });
-};
-
-const createUser: createUser = async function (
+const findByExternalId: UserModel['findByExternalId'] = async function (
   provider,
-  { id, email, firstName, lastName, picture }
+  id
 ) {
-  const existingUser = await this.findOne({ email });
-  if (existingUser) {
-    // TODO
-    // handle creating user with existing email through linking
-    return null;
-  }
-  return this.create({
-    email: email,
-    [provider]: id,
-    profile: {
-      firstName,
-      lastName,
-      picture,
-    },
+  return this.findOne({
+    $or: [{ [provider]: id }, { linked: { [provider]: id } }],
   });
 };
 
-const getUsers: getUsersType = async function ({ email }) {
+const findByEmail: UserModel['findByEmail'] = async function (email) {
+  return this.findOne({
+    $or: [
+      { email },
+      { linked: { googleEmail: email } },
+      { linked: { facebookEmail: email } },
+    ],
+  });
+};
+
+const createUser: UserModel['createUser'] = async function (
+  provider,
+  { id, email, firstName, lastName, picture, password }
+) {
+  if (provider === AuthProviders.email) {
+    const user = new User({
+      email,
+      activated: false,
+      emailActivationToken: randomBytes(12).toString('hex'),
+      emailActivationExpires: new Date(
+        Date.now() + EMAIL_ACTIVATION_EXPIRATION
+      ),
+      password,
+      profile: {
+        firstName,
+        lastName,
+        picture,
+      },
+    });
+    return user.save();
+  } else {
+    return this.create({
+      email: email,
+      activated: true,
+      [provider]: id,
+      profile: {
+        firstName,
+        lastName,
+        picture,
+      },
+    });
+  }
+};
+
+const getUsers: UserModel['getUsers'] = async function ({ email }) {
   const query: MongooseFilterQuery<UserDocument> = {};
   if (typeof email === 'string' && email !== '') {
     query.email = new RegExp(`^${escapeRegExp(email)}`);
@@ -187,6 +224,7 @@ const sendNotification: UserModel['sendNotification'] = async function (
   const subPromises = (user.webSubscriptions || []).map((sub) =>
     sendWebPushNotification(sub, data)
   );
+  // TODO handle errors - remove subscriptions if they are invalid
   return Promise.allSettled(subPromises);
 };
 
@@ -200,11 +238,23 @@ const removeSubscription: UserModel['removeSubscription'] = async function (
   );
 };
 
+const generateAuthTokens: UserDocument['generateAuthTokens'] = async function () {
+  const accessToken = generateAccessToken(this);
+  // generate refresh token, put it into DB along with expiration timestamp
+  const { refreshToken, expiresAt } = generateRefreshToken();
+  this.refreshToken = refreshToken;
+  this.refreshTokenExpiresAt = expiresAt;
+  await this.save();
+  return { accessToken, refreshToken };
+};
+
 userSchema.methods.comparePassword = comparePassword;
+userSchema.methods.generateAuthTokens = generateAuthTokens;
 userSchema.statics.findByExternalId = findByExternalId;
 userSchema.statics.createUser = createUser;
 userSchema.statics.getUsers = getUsers;
 userSchema.statics.sendNotification = sendNotification;
 userSchema.statics.removeSubscription = removeSubscription;
+userSchema.statics.findByEmail = findByEmail;
 
 export const User = mongoose.model<UserDocument, UserModel>('User', userSchema);
