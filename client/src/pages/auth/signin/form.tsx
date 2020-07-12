@@ -6,7 +6,7 @@ import { FormValues } from "./signin";
 
 export const SignInForm: React.FC<FormikProps<FormValues>> = ({
   submitForm,
-  isSubmitting
+  isSubmitting,
 }) => {
   return (
     <Form noValidate>

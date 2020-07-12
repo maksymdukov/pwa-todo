@@ -142,6 +142,9 @@ userSchema.pre('save', async function save(next) {
 const comparePassword: UserDocument['comparePassword'] = async function (
   candidatePassword
 ) {
+  if (!this.password) {
+    return false;
+  }
   return bcrypt.compare(candidatePassword, this.password);
 };
 

@@ -140,13 +140,15 @@ export const resetPasswordStart = async (req: Request, res: Response) => {
   user.passwordResetExpires = new Date(
     Date.now() + PASSWORD_RESET_TOKEN_EXPIIRATION
   );
+  await user.save();
 
+  const resetLink = `${config.CLIENT_PUBLIC_URL}/resetpasswordfinish?email=${user.email}&token=${user.passwordResetToken}`;
   // send email
   await mailerClient.sendMail({
     from: config.MAIL_USER,
     to: user.email,
     subject: '[PWA-NOTES-APP] Reset password request',
-    html: `Click <a href=${config.PUBLIC_URL}/resetpasswordfinish?email=${user.email}&token=${user.passwordResetToken}></a> to reset your password`,
+    html: `<a href="${resetLink}">Click</a> to reset your password. Type this link manually: ${resetLink}`,
   });
   res.send();
 };
@@ -178,8 +180,5 @@ export const resetPasswordFinish = async (req: Request, res: Response) => {
   user.passwordResetToken = undefined;
   user.passwordResetExpires = undefined;
   await user.save();
-
-  // login user
-  const tokens = await user.generateAuthTokens();
-  res.json(tokens);
+  res.send();
 };

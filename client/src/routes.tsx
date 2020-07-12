@@ -7,6 +7,8 @@ import { AuthRoutes } from "./auth-routes";
 import { ProtectedRoute } from "components/route";
 import SignUp from "pages/auth/signup";
 import ActivateAccount from "pages/auth/activate-account";
+import ResetPasswordStart from "pages/auth/reset-password-start";
+import ResetPasswordFinished from "pages/auth/reset-password-finish";
 
 export const Routes = () => {
   const isAuthenticated = useSelector(getIsAuthenticated);
@@ -35,6 +37,28 @@ export const Routes = () => {
             <Redirect to="/todos" />
           ) : (
             <ActivateAccount {...props} />
+          )
+        }
+      />
+      <Route
+        path="/resetpassword"
+        exact
+        render={(props) =>
+          isAuthenticated ? (
+            <Redirect to="/todos" />
+          ) : (
+            <ResetPasswordStart {...props} />
+          )
+        }
+      />
+      <Route
+        path="/resetpasswordfinish"
+        exact
+        render={(props) =>
+          isAuthenticated ? (
+            <Redirect to="/todos" />
+          ) : (
+            <ResetPasswordFinished {...props} />
           )
         }
       />

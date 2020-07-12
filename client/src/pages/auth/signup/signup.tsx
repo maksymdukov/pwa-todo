@@ -47,10 +47,8 @@ const SignUp = (props: RouteComponentProps) => {
       });
       setStatus({ error: null, success: true });
     } catch (error) {
-      console.dir(error);
-
-      // TODO extract error
-      if (error.response?.data?.errors[0]?.message) {
+      console.error(error);
+      if (error.response?.data?.errors) {
         setErrors(
           error.response?.data?.errors.reduce(
             (acc: any, err: { field: string; message: string }) => {
