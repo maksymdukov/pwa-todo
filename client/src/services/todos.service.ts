@@ -1,5 +1,5 @@
 import { Base } from "./base";
-import { ITodo, ISharedUser } from "../models/ITodo";
+import { ITodo } from "../models/ITodo";
 import { TodoHistoryChange } from "../models/ITodoHistoryChange";
 
 interface AllTodosResponse {
