@@ -46,6 +46,7 @@ export type UserDocument = mongoose.Document & {
   generateAuthTokens(
     this: UserDocument
   ): Promise<{ accessToken: string; refreshToken: string }>;
+  generateEmailActivationToken(this: UserDocument): Promise<string>;
   getProfile(this: UserDocument): IProfile;
 };
 
@@ -80,6 +81,10 @@ export type UserModel = mongoose.Model<UserDocument> & {
     endpoint: string
   ): Promise<void>;
   findByEmail(this: UserModel, email: string): Promise<UserDocument | null>;
+  findByPrimaryEmail(
+    this: UserModel,
+    email: string
+  ): Promise<UserDocument | null>;
 };
 
 interface IProfile {
@@ -183,6 +188,14 @@ const findByEmail: UserModel['findByEmail'] = async function (email) {
   });
 };
 
+const findByPrimaryEmail: UserModel['findByPrimaryEmail'] = async function (
+  email
+) {
+  return this.findOne({
+    email,
+  });
+};
+
 const createUser: UserModel['createUser'] = async function (
   provider,
   { id, email, firstName, lastName, picture, password }
@@ -276,8 +289,18 @@ const getProfile: UserDocument['getProfile'] = function () {
   };
 };
 
+const generateEmailActivationToken: UserDocument['generateEmailActivationToken'] = async function () {
+  this.emailActivationToken = randomBytes(12).toString('hex');
+  this.emailActivationExpires = new Date(
+    Date.now() + EMAIL_ACTIVATION_EXPIRATION
+  );
+  await this.save();
+  return this.emailActivationToken;
+};
+
 userSchema.methods.comparePassword = comparePassword;
 userSchema.methods.generateAuthTokens = generateAuthTokens;
+userSchema.methods.generateEmailActivationToken = generateEmailActivationToken;
 userSchema.methods.getProfile = getProfile;
 userSchema.statics.findByExternalId = findByExternalId;
 userSchema.statics.createUser = createUser;
@@ -285,5 +308,6 @@ userSchema.statics.getUsers = getUsers;
 userSchema.statics.sendNotification = sendNotification;
 userSchema.statics.removeSubscription = removeSubscription;
 userSchema.statics.findByEmail = findByEmail;
+userSchema.statics.findByPrimaryEmail = findByPrimaryEmail;
 
 export const User = mongoose.model<UserDocument, UserModel>('User', userSchema);

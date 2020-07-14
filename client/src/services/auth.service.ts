@@ -56,6 +56,15 @@ export class AuthService extends Base {
     });
   }
 
+  async resendEmailActivation(email: string) {
+    return this.request({
+      url: "/resend-email-activation",
+      method: "POST",
+      withAuth: false,
+      data: { email },
+    });
+  }
+
   async resetPasswordStart(data: { email: string }) {
     return this.request({
       url: "/resetpasswordstart",

@@ -8,6 +8,7 @@ import {
   resetPasswordStart,
   resetPasswordFinish,
   activateEmailAccount,
+  resendEmailActivationToken,
 } from '../../controllers/auth.controller';
 import { body } from 'express-validator';
 import { validateInput } from '../../middlewares/validate-input';
@@ -35,6 +36,13 @@ authRouter.post(
   ],
   validateInput,
   activateEmailAccount
+);
+
+authRouter.post(
+  '/resend-email-activation',
+  [body('email').isEmail()],
+  validateInput,
+  resendEmailActivationToken
 );
 
 authRouter.post(

@@ -25,6 +25,12 @@ const useStyles = makeStyles(({ spacing }) => ({
   btnEmail: {
     margin: "0 1rem",
   },
+  socialbtn: {
+    textTransform: "none",
+  },
+  icon: {
+    marginRight: spacing(),
+  },
   innerWrapper: {
     "& > *": {
       marginBottom: spacing(),
@@ -74,6 +80,7 @@ const SocialLinking = () => {
           {/* if registered not via google initially */}
           {!userState.googleId && (
             <Button
+              className={classes.socialbtn}
               variant="outlined"
               onClick={
                 userState.linked?.googleId
@@ -81,14 +88,14 @@ const SocialLinking = () => {
                   : handleLinkClick(LoginProviders.google)
               }
             >
-              <GoogleIcon />
+              <GoogleIcon className={classes.icon} />
               {!userState.linked?.googleId && "Link with Google"}
               {userState.linked?.googleId && (
                 <div style={{ display: "inline-block" }}>
                   <Typography className={classes.btnEmail} variant="caption">
                     Email: {userState.linked.googleEmail}
                   </Typography>
-                  Unlink
+                  UNLINK
                 </div>
               )}
             </Button>
@@ -96,20 +103,21 @@ const SocialLinking = () => {
           <br />
           <Button
             variant="outlined"
+            className={classes.socialbtn}
             onClick={
               userState.linked?.facebookId
                 ? handleUnlinkClick(LoginProviders.facebook)
                 : handleLinkClick(LoginProviders.facebook)
             }
           >
-            <FacebookIcon />
+            <FacebookIcon className={classes.icon} />
             {!userState.linked?.facebookId && "Link with Facebook"}
             {userState.linked?.facebookId && (
               <div style={{ display: "inline-block" }}>
                 <Typography className={classes.btnEmail} variant="caption">
                   Email: {userState.linked.facebookEmail}
                 </Typography>
-                Unlink
+                UNLINK
               </div>
             )}
           </Button>

@@ -12,6 +12,7 @@ import { UserActions } from "store/user/types";
 import { Link } from "react-router-dom";
 import { authService } from "services/auth.service";
 import { singinValidationSchema } from "./validation";
+import { ErrorCodes } from "errors/error-codes";
 
 export const useLoginStyles = makeStyles((theme) => ({
   sectionLayout: {
@@ -44,6 +45,7 @@ export interface FormValues {
 
 export const SignIn = (props: RouteComponentProps) => {
   const classes = useLoginStyles();
+  const history = useHistory();
   const dispatch = useDispatch<ThunkDispatch<AppState, void, UserActions>>();
   const initValues: FormValues = {
     email: "",
@@ -66,6 +68,12 @@ export const SignIn = (props: RouteComponentProps) => {
       setSubmitting(false);
       console.error(error);
       if (error.response?.data?.errors) {
+        const notActivatedError = error.response?.data?.errors.find(
+          (err: { code: ErrorCodes }) => err.code === ErrorCodes.NOT_ACTIVATED
+        );
+        if (notActivatedError) {
+          return history.push("/resend-activation-email", values.email);
+        }
         setErrors(
           error.response?.data?.errors.reduce(
             (acc: any, err: { field: string; message: string }) => {

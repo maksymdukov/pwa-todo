@@ -3,9 +3,11 @@ import { User, AuthProviders, UserDocument } from '../models/User';
 import { config } from '../config';
 import { RequestValidationError } from '../errors/validation-error';
 import { randomBytes } from 'crypto';
-import { mailerClient } from '../services/nodemailer';
+import { mailerClient, sendActivationToken } from '../services/nodemailer';
 import passport from 'passport';
 import { PassportAuthProviders } from '../interfaces/passport-auth-providers';
+import { CustomRequestError } from '../errors/request-error';
+import { ErrorCodes } from '../errors/error-codes';
 
 const PASSWORD_RESET_TOKEN_EXPIIRATION = 1000 * 60 * 15; // 15 mins;
 
@@ -78,15 +80,23 @@ export const registerUserViaEmail = async (req: Request, res: Response) => {
     firstName,
     lastName,
   });
-  const activationLink = `${config.CLIENT_PUBLIC_URL}/activateaccount?email=${newUser.email}&token=${newUser.emailActivationToken}`;
-  // send email
-  mailerClient.sendMail({
-    from: config.MAIL_USER,
-    to: newUser.email,
-    subject: '[PWA-NOTES-APP] Confirm registration',
-    html: `<a href="${activationLink}">Click</a> to activate your account.
-     Or manually follow this link: ${activationLink}`,
-  });
+  sendActivationToken(newUser.email, newUser.emailActivationToken);
+  res.send();
+};
+
+export const resendEmailActivationToken = async (
+  req: Request,
+  res: Response
+) => {
+  const { email } = req.body;
+  const user = await User.findByPrimaryEmail(email);
+  if (user.activated) {
+    throw new RequestValidationError([
+      { msg: 'Already activated', param: 'email' },
+    ]);
+  }
+  const token = await user.generateEmailActivationToken();
+  await sendActivationToken(email, token);
   res.send();
 };
 
@@ -117,7 +127,13 @@ export const activateEmailAccount = async (req: Request, res: Response) => {
 
 export const loginViaEmail = async (req: Request, res: Response) => {
   const { email, password }: { email: string; password: string } = req.body;
-  const user = await User.findByEmail(email);
+  const user = await User.findByPrimaryEmail(email);
+  if (!user.activated) {
+    throw new CustomRequestError(
+      'Email needs activation',
+      ErrorCodes.NOT_ACTIVATED
+    );
+  }
   const isValidPassword = await user.comparePassword(password);
   if (!isValidPassword) {
     throw new RequestValidationError([
