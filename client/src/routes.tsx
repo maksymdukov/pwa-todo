@@ -9,9 +9,11 @@ import SignUp from "pages/auth/signup";
 import ActivateAccount from "pages/auth/activate-account";
 import ResetPasswordStart from "pages/auth/reset-password-start";
 import ResetPasswordFinished from "pages/auth/reset-password-finish";
+import { useServiceWorkerEvents } from "hooks/use-service-worker-events";
 
 export const Routes = () => {
   const isAuthenticated = useSelector(getIsAuthenticated);
+  useServiceWorkerEvents();
   // TODO refactor routes to avoid code duplications
   return (
     <Switch>
