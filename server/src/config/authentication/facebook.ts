@@ -1,6 +1,5 @@
 import passport from 'passport';
 import passportFacebook, { StrategyOption } from 'passport-facebook';
-import jwt from 'jsonwebtoken';
 import { AuthProviders, User } from '../../models/User';
 import { config } from '..';
 
