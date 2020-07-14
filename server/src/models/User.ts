@@ -24,6 +24,8 @@ export type UserDocument = mongoose.Document & {
   activated: boolean;
   emailActivationToken?: string;
   emailActivationExpires?: Date;
+  linkToken?: string;
+  linkTokenExpires?: Date;
   password?: string;
   passwordResetToken?: string;
   passwordResetExpires?: Date;
@@ -44,6 +46,7 @@ export type UserDocument = mongoose.Document & {
   generateAuthTokens(
     this: UserDocument
   ): Promise<{ accessToken: string; refreshToken: string }>;
+  getProfile(this: UserDocument): IProfile;
 };
 
 export type UserModel = mongoose.Model<UserDocument> & {
@@ -79,6 +82,13 @@ export type UserModel = mongoose.Model<UserDocument> & {
   findByEmail(this: UserModel, email: string): Promise<UserDocument | null>;
 };
 
+interface IProfile {
+  linked?: UserDocument['linked'];
+  facebookId?: string;
+  googleId?: string;
+  profile: ProfileDocument;
+}
+
 export interface AuthToken {
   accessToken: string;
   kind: string;
@@ -90,6 +100,8 @@ export const userSchema = new mongoose.Schema(
     activated: { type: Boolean, required: true, default: false },
     emailActivationToken: String,
     emailActivationExpires: Date,
+    linkToken: String,
+    linkTokenExpires: Date,
     password: String,
     passwordResetToken: String,
     passwordResetExpires: Date,
@@ -102,6 +114,7 @@ export const userSchema = new mongoose.Schema(
         facebookId: String,
         facebookEmail: String,
       },
+      default: {},
     },
     tokens: Array,
     webSubscriptions: [
@@ -152,8 +165,11 @@ const findByExternalId: UserModel['findByExternalId'] = async function (
   provider,
   id
 ) {
+  console.log('google id', typeof id);
+  console.log('provider', provider);
+
   return this.findOne({
-    $or: [{ [provider]: id }, { linked: { [provider]: id } }],
+    $or: [{ [provider]: id }, { [`linked.${provider}`]: id }],
   });
 };
 
@@ -161,8 +177,8 @@ const findByEmail: UserModel['findByEmail'] = async function (email) {
   return this.findOne({
     $or: [
       { email },
-      { linked: { googleEmail: email } },
-      { linked: { facebookEmail: email } },
+      { 'linked.googleEmail': email },
+      { 'linked.facebookEmail': email },
     ],
   });
 };
@@ -251,8 +267,18 @@ const generateAuthTokens: UserDocument['generateAuthTokens'] = async function ()
   return { accessToken, refreshToken };
 };
 
+const getProfile: UserDocument['getProfile'] = function () {
+  return {
+    linked: this.linked,
+    googleId: this.googleId,
+    facebookId: this.facebookId,
+    profile: this.profile,
+  };
+};
+
 userSchema.methods.comparePassword = comparePassword;
 userSchema.methods.generateAuthTokens = generateAuthTokens;
+userSchema.methods.getProfile = getProfile;
 userSchema.statics.findByExternalId = findByExternalId;
 userSchema.statics.createUser = createUser;
 userSchema.statics.getUsers = getUsers;

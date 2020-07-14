@@ -5,6 +5,7 @@ import { AuthData } from "pages/auth/signin/types";
 import { AppThunk } from "store/tools";
 import { UserProfile } from "./reducer";
 import { idb } from "services/idb.service";
+import { ProfileResponse, usersService } from "services/users.service";
 
 export const loginStart = (): UserActions => ({
   type: userActionTypes.LOGIN_START,
@@ -28,6 +29,30 @@ export const loginError = (): UserActions => ({
 export const logoutAction = (): UserActions => ({
   type: userActionTypes.LOGOUT,
 });
+
+export const fetchProfileStart = (): UserActions => ({
+  type: userActionTypes.FETCH_PROFILE_START,
+});
+
+export const fetchProfileSuccess = (data: ProfileResponse): UserActions => ({
+  type: userActionTypes.FETCH_PROFILE_SUCCESS,
+  payload: data,
+});
+export const fetchProfileFail = (error?: string): UserActions => ({
+  type: userActionTypes.FETCH_PROFILE_FAIL,
+  payload: { error },
+});
+
+export const fetchProfile = (): AppThunk => async (dispatch, getState) => {
+  try {
+    dispatch(fetchProfileStart());
+    const { data } = await usersService.getProfile();
+    dispatch(fetchProfileSuccess(data));
+  } catch (error) {
+    console.error(error);
+    dispatch(fetchProfileFail("Error occured"));
+  }
+};
 
 const timeout = (timeout: number): Promise<void> =>
   new Promise((resolve) => {

@@ -1,5 +1,6 @@
 import { userActionTypes, UserActions } from "./types";
 import { authPersistence } from "services/auth-persistence";
+import { ProfileResponse } from "services/users.service";
 
 export type UserProfile = Readonly<{
   id: string;
@@ -12,8 +13,11 @@ export type UserProfile = Readonly<{
 export type UserState = Readonly<{
   isAuthenticated: boolean;
   isAuthenticating: boolean;
+  profileLoading: boolean;
+  profileError: null | string;
 }> &
-  UserProfile;
+  UserProfile &
+  ProfileResponse;
 
 const decoded = authPersistence.getDecodedAccessToken();
 
@@ -25,6 +29,23 @@ const initState: UserState = {
   firstName: decoded?.firstName || "",
   lastName: decoded?.lastName || "",
   picture: decoded?.picture || "",
+  facebookId: "",
+  googleId: "",
+  profile: {
+    id: "",
+    email: "",
+    firstName: "",
+    lastName: "",
+    picture: "",
+  },
+  profileLoading: false,
+  profileError: null,
+  linked: {
+    googleId: "",
+    googleEmail: "",
+    facebookEmail: "",
+    facebookId: "",
+  },
 };
 
 export const userReducer = (
@@ -47,6 +68,7 @@ export const userReducer = (
       };
     case userActionTypes.LOGOUT:
       return {
+        ...initState,
         isAuthenticated: false,
         isAuthenticating: false,
         id: "",
@@ -54,6 +76,23 @@ export const userReducer = (
         firstName: "",
         lastName: "",
         picture: "",
+      };
+    case userActionTypes.FETCH_PROFILE_START:
+      return {
+        ...state,
+        profileLoading: true,
+      };
+    case userActionTypes.FETCH_PROFILE_SUCCESS:
+      return {
+        ...state,
+        profileLoading: false,
+        ...action.payload,
+      };
+    case userActionTypes.FETCH_PROFILE_FAIL:
+      return {
+        ...state,
+        profileLoading: false,
+        profileError: action.payload.error ?? null,
       };
     default:
       return state;

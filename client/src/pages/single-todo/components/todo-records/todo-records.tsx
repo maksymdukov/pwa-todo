@@ -28,12 +28,14 @@ const TodoRecords = ({
   changeTodoRecords,
   editable,
 }: TodoRecordsProps) => {
+  const isTouched = useRef(false);
   const lastItemRef = useRef<HTMLTextAreaElement>(null);
   const refs = useRef<{ [key: number]: HTMLTextAreaElement }>({});
   const prevTodos = usePrevious(todoRecords);
 
   const onDragEnd = useCallback(
     (result: DropResult) => {
+      isTouched.current = true;
       if (!result.destination) {
         return;
       }
@@ -50,6 +52,7 @@ const TodoRecords = ({
 
   const onContentChange = useCallback<ContentChangeHandler>(
     (idx, value) => {
+      isTouched.current = true;
       const updatedTodo = {
         ...todoRecords[idx],
         content: value,
@@ -74,6 +77,7 @@ const TodoRecords = ({
   );
 
   const onAddNewChange = (value: string) => {
+    isTouched.current = true;
     const newTodo = {
       id: new Date().toISOString(),
       content: value,
@@ -84,7 +88,12 @@ const TodoRecords = ({
 
   useEffect(() => {
     // When new item is added - focus on the last one
-    if (prevTodos.length < todoRecords.length && lastItemRef.current) {
+    if (
+      prevTodos.length < todoRecords.length &&
+      lastItemRef.current &&
+      // only if we're adding new todo
+      isTouched.current
+    ) {
       lastItemRef.current.focus();
       // move caret to the end
       const val = lastItemRef.current.value;

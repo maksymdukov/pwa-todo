@@ -11,11 +11,13 @@ export enum SyncStatus {
 export type TodosStateType = {
   items: ITodo[];
   syncStatus: SyncStatus;
+  itemsInitialized: boolean;
 };
 
 const initialState: TodosStateType = {
   items: [],
   syncStatus: SyncStatus.NOT_STARTED,
+  itemsInitialized: false,
 };
 
 export const todosReducer = (
@@ -44,6 +46,7 @@ export const todosReducer = (
       return {
         ...state,
         items: action.payload.items,
+        itemsInitialized: true,
       };
     default:
       return state;

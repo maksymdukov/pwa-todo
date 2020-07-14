@@ -8,7 +8,11 @@ import { getTodoItemState } from "store/todo/todo.selectors";
 import SaveTodoBtn from "./elements/save-todo-btn";
 import { ITodo, ITodoRecord } from "models/ITodo";
 import { postTodo } from "store/todo/todo.actions";
-import { getSyncState, getTodoItems } from "store/todos/todos.selectors";
+import {
+  getSyncState,
+  getTodoItems,
+  getTodoItemsInitialized,
+} from "store/todos/todos.selectors";
 import { getUserState } from "store/user/selectors";
 import { SyncStatus } from "store/todos/todos.reducer";
 import BackBtn from "components/buttons/back-btn";
@@ -22,6 +26,7 @@ const SingleTodo = ({ match, isNew }: SingleTodoProps) => {
   const history = useHistory();
   const todoToEdit = useSelector(getTodoItemState);
   const todos = useSelector(getTodoItems);
+  const todosInitialized = useSelector(getTodoItemsInitialized);
   const syncStatus = useSelector(getSyncState);
   const dispatch = useDispatch();
   const [todo, setTodo] = useState<ITodo>(todoToEdit);
@@ -47,8 +52,8 @@ const SingleTodo = ({ match, isNew }: SingleTodoProps) => {
       return;
     }
 
-    if (match.params.id && !syncing) {
-      if (!setItemToEdit(match.params.id)) {
+    if (match.params.id) {
+      if (todosInitialized && !setItemToEdit(match.params.id)) {
         // Can not find note
         history.push("/todos");
       }
@@ -64,6 +69,7 @@ const SingleTodo = ({ match, isNew }: SingleTodoProps) => {
     todos,
     setItemToEdit,
     history,
+    todosInitialized,
   ]);
 
   const changeTodoRecords = useCallback(

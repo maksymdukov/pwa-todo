@@ -6,6 +6,8 @@ import passportGoogle, {
 } from 'passport-google-oauth';
 import { AuthProviders, User } from '../../models/User';
 import { config } from '..';
+import { PassportAuthProviders } from '../../interfaces/passport-auth-providers';
+import { Request } from 'express';
 
 const opts: IOAuth2StrategyOption = {
   clientID: config.GOOGLE_CLIENT_ID,
@@ -54,15 +56,17 @@ passport.use(
 );
 
 passport.use(
-  'google-link',
+  PassportAuthProviders.googleLink,
   new passportGoogle.OAuth2Strategy(
     {
       clientID: config.GOOGLE_CLIENT_ID,
       clientSecret: config.GOOGLE_CLIENT_SECRET,
-      callbackURL: `${config.PUBLIC_URL}/api/v0/auth/google-link/callback`,
+      callbackURL: `${config.PUBLIC_URL}/api/v0/users/google-link/callback`,
       accessType: 'code',
+      passReqToCallback: true,
     },
     async (
+      req: Request,
       accessToken: string,
       refreshToken: string,
       profile: Profile,
@@ -73,9 +77,14 @@ passport.use(
         profile.id
       );
       if (possibleUser) {
-        return done({ message: 'User with this googleId already exist' });
+        // already used in the app somewhere
+        return done(null, false);
       }
-      return done(null, { accessToken });
+      return done(null, {
+        email: profile.emails[0]?.value,
+        id: profile.id,
+        linkToken: req.query.state,
+      });
     }
   )
 );

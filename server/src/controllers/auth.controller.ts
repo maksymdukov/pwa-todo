@@ -16,10 +16,11 @@ export const generateUserTokens = (provider: PassportAuthProviders) => async (
   passport.authenticate(
     provider,
     { session: false },
-    async (err, user: UserDocument | null, info) => {
+    async (err, user: UserDocument | null) => {
       const origin = `${config.CLIENT_PUBLIC_URL}/signin`;
       if (err || !user) {
-        res.render('authenticated', {
+        // if main account already exist then fail
+        return res.render('authenticated', {
           accessToken: '',
           refreshToken: '',
           error:

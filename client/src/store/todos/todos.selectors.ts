@@ -5,6 +5,10 @@ import { getUserState } from "store/user/selectors";
 export const getTodosState = (state: AppState) => state.todos;
 
 export const getTodoItems = createSelector(getTodosState, ({ items }) => items);
+export const getTodoItemsInitialized = createSelector(
+  getTodosState,
+  ({ itemsInitialized }) => itemsInitialized
+);
 
 export const getSyncState = createSelector(
   getTodosState,

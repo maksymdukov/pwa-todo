@@ -60,8 +60,10 @@ export const SignIn = (props: RouteComponentProps) => {
         email: values.email,
         password: values.password,
       });
+      setSubmitting(false);
       dispatch(doLogin({ accessToken, refreshToken }));
     } catch (error) {
+      setSubmitting(false);
       console.error(error);
       if (error.response?.data?.errors) {
         setErrors(
@@ -74,8 +76,6 @@ export const SignIn = (props: RouteComponentProps) => {
           )
         );
       }
-    } finally {
-      setSubmitting(false);
     }
   };
   return (

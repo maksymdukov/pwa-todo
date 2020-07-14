@@ -2,10 +2,39 @@ import { Base } from "./base";
 import { CancelToken } from "axios";
 import { ISharedUser } from "models/ITodo";
 import { IWebSubscription } from "models/IWebSubscription";
+import { UserProfile } from "store/user/reducer";
+import { LoginProviders } from "hooks/use-auth-popup";
 
 export type GetUserResponse = ISharedUser[];
 
+export type ProfileResponse = {
+  linked?: {
+    googleId?: string;
+    googleEmail?: string;
+    facebookId?: string;
+    facebookEmail?: string;
+  };
+  googleId?: string;
+  facebookId: string;
+  profile: UserProfile;
+};
+
 export class UsersService extends Base {
+  async getProfile() {
+    return this.request<ProfileResponse>({
+      method: "GET",
+      url: "/profile",
+    });
+  }
+
+  unlinkProvider(provider: LoginProviders) {
+    return this.request({
+      method: "PATCH",
+      url: "/unlink-provider",
+      data: { provider },
+    });
+  }
+
   async getUsers(email: string, cancelToken: CancelToken) {
     return this.request<GetUserResponse>({
       method: "GET",
@@ -17,8 +46,15 @@ export class UsersService extends Base {
   async changePassword(data: { newPassword: string }) {
     return this.request({
       method: "POST",
-      url: "changepassword",
+      url: "/changepassword",
       data,
+    });
+  }
+
+  async getLinkToken() {
+    return this.request<{ linkToken: string }>({
+      method: "GET",
+      url: "/getlinktoken",
     });
   }
 

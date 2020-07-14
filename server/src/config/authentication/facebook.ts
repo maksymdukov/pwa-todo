@@ -82,7 +82,7 @@ passport.use(
         profile.id
       );
       if (possibleUser) {
-        return done({ message: 'User with this facebookId already exist' });
+        return done(null, false);
       }
       return done(null, { accessToken });
     }

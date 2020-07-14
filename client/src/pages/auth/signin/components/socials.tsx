@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback } from "react";
 import { Button, Typography, makeStyles } from "@material-ui/core";
 import { GoogleIcon } from "components/icons/google";
 import { FacebookIcon } from "components/icons/facebook";
@@ -6,11 +6,7 @@ import { config } from "config/config";
 import { useDispatch } from "react-redux";
 import { doLogin } from "store/user/actions";
 import { AuthData } from "../types";
-
-enum LoginProviders {
-  google = "google",
-  facebook = "facebook",
-}
+import { LoginProviders, useAuthPopup } from "hooks/use-auth-popup";
 
 interface SocialsProps {
   signup?: boolean;
@@ -31,45 +27,19 @@ const useStyles = makeStyles(({ spacing }) => ({
   },
 }));
 
+const getSocialLink = (provider: LoginProviders) =>
+  `${config.BASE_API_URL}/auth/${provider}/start`;
+
 const Socials = ({ signup = false }: SocialsProps) => {
   const classes = useStyles();
   const dispatch = useDispatch();
-  const popupRef = useRef<Window | null>();
-  const [error, setError] = useState("");
-
-  const loginSuccessHandler = useCallback(
-    (event: MessageEvent) => {
-      if (popupRef.current === event.source) {
-        const authData: AuthData = JSON.parse(event.data);
-        if (authData.error) {
-          return setError(authData.error);
-        }
-        dispatch(doLogin(JSON.parse(event.data)));
-        console.log(JSON.parse(event.data));
-      }
+  const onAuthSuccess = useCallback(
+    (data: AuthData) => {
+      dispatch(doLogin(data));
     },
     [dispatch]
   );
-
-  useEffect(() => {
-    window.addEventListener("message", loginSuccessHandler);
-    return () => {
-      window.removeEventListener("message", loginSuccessHandler);
-    };
-  }, [loginSuccessHandler]);
-
-  const openPopup = (provider: LoginProviders) => {
-    setError("");
-    const width = 500;
-    const height = 500;
-    const left = window.screenX + window.outerWidth / 2 - width / 2;
-    const top = window.outerHeight / 2 - height / 2;
-    popupRef.current = window.open(
-      `${config.BASE_API_URL}/auth/${provider}/start`,
-      "Authorization",
-      `toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width=${width}, height=${height}, left=${left}, top=${top}`
-    );
-  };
+  const { openPopup, error } = useAuthPopup({ onSuccess: onAuthSuccess });
 
   return (
     <>
@@ -77,7 +47,7 @@ const Socials = ({ signup = false }: SocialsProps) => {
         <div className={classes.innerWrapper}>
           <Button
             variant="outlined"
-            onClick={() => openPopup(LoginProviders.google)}
+            onClick={() => openPopup(LoginProviders.google, getSocialLink)}
           >
             <GoogleIcon />
             {signup ? "Signup" : "Login"} with Google
@@ -85,7 +55,7 @@ const Socials = ({ signup = false }: SocialsProps) => {
           <br />
           <Button
             variant="outlined"
-            onClick={() => openPopup(LoginProviders.facebook)}
+            onClick={() => openPopup(LoginProviders.facebook, getSocialLink)}
           >
             <FacebookIcon />
             {signup ? "Signup" : "Login"} with Facebook
