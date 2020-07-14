@@ -12,7 +12,7 @@ import ResetPasswordFinished from "pages/auth/reset-password-finish";
 
 export const Routes = () => {
   const isAuthenticated = useSelector(getIsAuthenticated);
-  // TODO refactor to avoid code duplications
+  // TODO refactor routes to avoid code duplications
   return (
     <Switch>
       <Route
