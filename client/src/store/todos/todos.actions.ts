@@ -102,7 +102,6 @@ export const syncTodos = (): AppThunk => async (dispatch, getState) => {
 
     if (error.code === ErrorCodes.ECONNABORTED) {
       // Set status to offline
-      // TODO Can potentially be moved to the base class for GET requests
       dispatch(checkConnection(runOnlineActions));
     }
   }

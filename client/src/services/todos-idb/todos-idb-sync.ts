@@ -46,8 +46,7 @@ export class TodosIDBSync {
     });
 
     // TODO Use chain of promises instead of Promise.all
-    // @ts-ignore
-    await Promise.all(promises);
+    await Promise.all<string | void>(promises);
     await tx.done;
     await this.db.keyval.set(KeyValKeys.lastTimeUpdated, String(timestamp));
   }
