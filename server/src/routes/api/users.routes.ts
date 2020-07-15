@@ -12,6 +12,7 @@ import {
   linkAuthProviderStart,
   getLinkToken,
   saveProfile,
+  deleteAccount,
 } from '../../controllers/users.controller';
 import { body, query } from 'express-validator';
 import { validateInput } from '../../middlewares/validate-input';
@@ -72,6 +73,7 @@ usersRouter.post(
 );
 
 usersRouter.get('/getlinktoken', isAuthenticated, getLinkToken);
+usersRouter.post('/deleteaccount', isAuthenticated, deleteAccount);
 
 usersRouter.patch(
   '/unlink-provider',

@@ -5,16 +5,17 @@ import { usersService } from "services/users.service";
 import { IWebSubscription } from "models/IWebSubscription";
 import { ConnectionStatus } from "store/tech/tech.reducer";
 
-const getSubscription = async () => {
+export const getSubscription = async () => {
   const swReg = await navigator.serviceWorker.ready;
   const subscription = await swReg.pushManager.getSubscription();
   return { swReg, subscription };
 };
 
-const configurePushSub = async (remove?: boolean) => {
+export const configurePushSub = async (remove?: boolean) => {
   try {
     const { subscription, swReg } = await getSubscription();
     if (subscription === null) {
+      if (remove) return;
       const resp = await swReg.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: urlBase64ToUint8Array(config.VAPID_PUBLIC_KEY!),

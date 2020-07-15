@@ -6,6 +6,9 @@ import { TodoHistory } from '../models/TodoHistory';
 import { TodoHistoryReason } from '../models/TodoHistoryReason';
 import { TodoRecordDocument } from '../models/TodoRecord';
 import { Notification, NotificationDocument } from '../models/Notification';
+import { CustomRequestError } from '../errors/request-error';
+import { AuthorizationError } from '../errors/authorization-error';
+import { NotFoundError } from '../errors/not-found-error';
 
 export const getMyTodos = async (req: Request, res: Response) => {
   const user = req.user as UserDocument;
@@ -29,13 +32,13 @@ export const getTodo = async (req: Request, res: Response) => {
   const user = req.user as UserDocument;
   const todo = await Todo.findTodoById(todoId);
   if (!todo) {
-    return res.status(400).json({ error: { message: 'not found' } });
+    throw new NotFoundError();
   }
   if (
     (todo.creator as UserDocument).id !== user.id &&
     !(todo.shared as UserDocument[]).find((usr) => usr.id === user.id)
   ) {
-    return res.status(403).json({ error: { message: 'Unauthorised' } });
+    throw new AuthorizationError();
   }
   res.json(todo);
 };
@@ -70,11 +73,11 @@ export const editTodo = async (req: Request, res: Response) => {
 
   const todo = await Todo.findTodoById(todoId);
   if (!todo) {
-    return res.status(400).json({ errors: [{ message: 'not found' }] });
+    throw new NotFoundError();
   }
 
   if (!todo.creator.equals(req.user.id)) {
-    return res.status(403).json({ errors: [{ message: 'Unathorized' }] });
+    throw new AuthorizationError();
   }
 
   title && (todo.title = title);
@@ -96,10 +99,10 @@ export const deleteTodo = async (req: Request, res: Response) => {
   const { todoId } = req.params;
   const todo = await Todo.findTodoById(todoId);
   if (!todo) {
-    return res.status(400).json({ errors: [{ message: 'not found' }] });
+    throw new NotFoundError();
   }
   if (!todo.creator.equals(req.user.id)) {
-    return res.status(403).json({ errors: [{ message: 'Unathorized' }] });
+    throw new AuthorizationError();
   }
   await todo.remove();
 
@@ -138,18 +141,16 @@ export const shareTodo = async (req: Request, res: Response) => {
   const user = req.user as UserDocument;
   const todo = await Todo.findById(todoId);
   if (userId === user.id) {
-    return res
-      .status(422)
-      .json({ error: { message: 'Cannot share with yourself' } });
+    throw new CustomRequestError('Cannot share with yourself');
   }
   if (!todo) {
-    return res.status(422).json({ error: { message: 'Todo not found' } });
+    throw new NotFoundError();
   }
   if (todo.creator.toString() !== user.id) {
-    return res.status(401).json({ error: { message: 'Unauthorised' } });
+    throw new AuthorizationError();
   }
   if (todo.shared.includes(userId)) {
-    return res.status(422).json({ error: { message: 'Already shared' } });
+    throw new CustomRequestError('Already shared');
   }
   todo.shared.push(userId);
   await todo.save();
@@ -182,15 +183,13 @@ export const revokeTodoShare = async (req: Request, res: Response) => {
   const user = req.user as UserDocument;
   const todo = await Todo.findById(todoId);
   if (!todo) {
-    return res.status(422).json({ error: { message: 'Todo not found' } });
+    throw new NotFoundError();
   }
   if (todo.creator.toString() !== user.id) {
-    return res.status(401).json({ error: { message: 'Unauthorised' } });
+    throw new AuthorizationError();
   }
   if (!todo.shared.some((sharedWith) => sharedWith.equals(userId))) {
-    return res
-      .status(422)
-      .json({ error: { message: 'Is not previously shared' } });
+    throw new CustomRequestError('Is not previously shared');
   }
   todo.shared = todo.shared.filter((usrId) => !usrId.equals(userId));
   await todo.save();
@@ -227,7 +226,5 @@ export const getChanges = async (req: Request, res: Response) => {
     null,
     { sort: { createdAt: 1 } }
   );
-  console.log('changes', changes);
-
   res.json({ items: changes, lastTimeUpdated: timeUpdated });
 };

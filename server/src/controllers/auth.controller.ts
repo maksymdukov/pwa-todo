@@ -128,6 +128,12 @@ export const activateEmailAccount = async (req: Request, res: Response) => {
 export const loginViaEmail = async (req: Request, res: Response) => {
   const { email, password }: { email: string; password: string } = req.body;
   const user = await User.findByPrimaryEmail(email);
+  if (!user) {
+    throw new RequestValidationError([
+      { msg: 'Wrong email or password', param: 'email' },
+      { msg: 'Wrong email or password', param: 'password' },
+    ]);
+  }
   if (!user.activated) {
     throw new CustomRequestError(
       'Email needs activation',

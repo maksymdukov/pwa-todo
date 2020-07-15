@@ -1,11 +1,15 @@
 import { Response, Request, NextFunction } from 'express';
 import { WebSubscription } from '../interfaces/IWebSubscription';
-import { User } from '../models/User';
+import { User, UserDocument } from '../models/User';
 import passport from 'passport';
 import { PassportAuthProviders } from '../interfaces/passport-auth-providers';
 import { config } from '../config';
 import { randomBytes } from 'crypto';
 import { RequestValidationError } from '../errors/validation-error';
+import { Todo, TodoDocument } from '../models/Todo';
+import { TodoHistory, TodoHistoryDocument } from '../models/TodoHistory';
+import { TodoHistoryReason } from '../models/TodoHistoryReason';
+import { remove } from 'lodash';
 
 const LINK_TOKEN_EXPIRES = 1000 * 60; // 1 min
 
@@ -184,5 +188,56 @@ export const unlinkAuthProvider = async (req: Request, res: Response) => {
   }
 
   await req.user.save();
+  res.send();
+};
+
+export const deleteAccount = async (req: Request, res: Response) => {
+  // delete notes owned by this user
+  const todos = await Todo.findTodosByCreatorId(req.user.id);
+  const historyPromises = [];
+  const removePromises = [];
+  for (const todo of todos) {
+    historyPromises.push(
+      TodoHistory.build({
+        userIds: [req.user.id],
+        todo: todo,
+        reason: TodoHistoryReason.deleted,
+      })
+    );
+    removePromises.push(todo.remove());
+  }
+  await Promise.all(removePromises);
+  await Promise.all(historyPromises);
+
+  // unshare all todos shared with this user
+  const sharedWithMePopulated = await Todo.findTodosBySharedId(
+    req.user.id,
+    true
+  );
+
+  const sharedWithMe = await Todo.findTodosBySharedId(req.user.id);
+  const sharedPromises: Promise<TodoDocument>[] = [];
+  sharedWithMe.forEach((todo) => {
+    todo.shared = todo.shared.filter((usrId) => !usrId.equals(req.user.id));
+    sharedPromises.push(todo.save());
+  });
+  await Promise.all(sharedPromises);
+
+  const unsharedNotificationsPromises: Promise<TodoHistoryDocument>[] = [];
+  sharedWithMePopulated.forEach((todo) => {
+    unsharedNotificationsPromises.push(
+      TodoHistory.build({
+        userIds: [(todo.creator as UserDocument).id, req.user.id],
+        todo: todo,
+        reason: TodoHistoryReason.unshared,
+      })
+    );
+  });
+  await Promise.all(unsharedNotificationsPromises);
+
+  // delete user record
+  await req.user.remove();
+
+  // Maybe release request earlier ?
   res.send();
 };

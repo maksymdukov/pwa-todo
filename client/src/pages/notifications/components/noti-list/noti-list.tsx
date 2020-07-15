@@ -96,10 +96,10 @@ const NotiList = ({
             elevation={3}
           >
             <ListItemAvatar>
-              <UserAvatar src={noti.sender.profile.picture} />
+              <UserAvatar src={noti.sender?.profile?.picture} />
             </ListItemAvatar>
             <ListItemText>
-              <Typography>Email: {noti.sender.email}</Typography>
+              <Typography>Email: {noti.sender?.email || 'Deleted'}</Typography>
               <Typography>Type: {noti.reason}</Typography>
               <Typography>Title: {noti.data.title}</Typography>
             </ListItemText>

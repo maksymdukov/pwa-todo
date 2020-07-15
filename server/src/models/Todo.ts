@@ -29,7 +29,8 @@ export type TodoModel = mongoose.Model<TodoDocument> & {
   ) => Promise<TodoDocument | null>;
   findTodosBySharedId: (
     this: TodoModel,
-    userId: string
+    userId: string,
+    populateShared?: boolean
   ) => Promise<TodoDocument[] | null>;
   findAllUserRelatedTodos: (
     this: TodoModel,
@@ -77,13 +78,18 @@ const findTodoById: TodoModel['findTodoById'] = async function (todoId) {
 };
 
 const findTodosBySharedId: TodoModel['findTodosBySharedId'] = async function (
-  userId
+  userId,
+  populateShared
 ) {
   // @ts-ignore
-  return this.find({ shared: userId }, { shared: 0 }).populate(
+  const request = this.find({ shared: userId }, { shared: 0 }).populate(
     'creator',
     'email id profile'
   );
+  if (populateShared) {
+    request.populate('shared', 'email id profile');
+  }
+  return request;
 };
 
 const findAllUserRelatedTodos: TodoModel['findAllUserRelatedTodos'] = async function (

@@ -66,6 +66,13 @@ export class UsersService extends Base {
     });
   }
 
+  async deleteAccount() {
+    return this.request({
+      method: "POST",
+      url: "/deleteaccount",
+    });
+  }
+
   async checkPushSubscription(endpoint: string) {
     return this.request({
       method: "GET",
