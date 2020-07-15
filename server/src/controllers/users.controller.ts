@@ -9,7 +9,6 @@ import { RequestValidationError } from '../errors/validation-error';
 import { Todo, TodoDocument } from '../models/Todo';
 import { TodoHistory, TodoHistoryDocument } from '../models/TodoHistory';
 import { TodoHistoryReason } from '../models/TodoHistoryReason';
-import { remove } from 'lodash';
 
 const LINK_TOKEN_EXPIRES = 1000 * 60; // 1 min
 

@@ -7,7 +7,6 @@ import {
   Typography,
   Paper,
   makeStyles,
-  Box,
 } from "@material-ui/core";
 import { INotification } from "models/INotification";
 import UserAvatar from "components/user-avatar";
