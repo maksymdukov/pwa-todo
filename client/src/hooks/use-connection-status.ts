@@ -6,8 +6,6 @@ export const useConnectionEffect = () => {
   const dispatch = useDispatch();
   useEffect(() => {
     const updateOnlineStatus = () => {
-      console.log("navigator.onLine changed", navigator.onLine);
-
       if (navigator.onLine) {
         dispatch(runOnlineActions());
       } else {

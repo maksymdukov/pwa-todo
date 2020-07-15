@@ -50,7 +50,6 @@ export const useSocketIO = () => {
       },
     });
     socketRef.current.on("connect", () => {
-      console.log("Connected to server event");
       dispatch(runOnlineActions());
     });
     socketRef.current.on("reconnect_attempt", (numb: any) => {

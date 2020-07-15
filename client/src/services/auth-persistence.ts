@@ -47,8 +47,6 @@ export class AuthPersistence {
   isAccessTokenExpired(accessToken: string): boolean {
     const now = Math.round(new Date().getTime() / 1000);
     const { exp } = jwtDecode(accessToken);
-    console.log("now", now);
-    console.log("exp", exp);
     return now + 60 > exp;
   }
 

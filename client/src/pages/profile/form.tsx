@@ -1,24 +1,23 @@
-import React from "react";
-import { Form, Field, FormikProps } from "formik";
-import { TextField } from "formik-material-ui";
-import { LinearProgress } from "@material-ui/core";
-import Button from "@material-ui/core/Button";
-import { makeStyles } from "@material-ui/core/styles";
-import { ProfileFormValues } from "./profile";
+import React from 'react';
+import { Form, Field, FormikProps } from 'formik';
+import { TextField } from 'formik-material-ui';
+import { LinearProgress } from '@material-ui/core';
+import Button from '@material-ui/core/Button';
+import { makeStyles } from '@material-ui/core/styles';
+import { ProfileFormValues } from './profile';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(theme => ({
   form: {
-    "& > *": {
-      marginBottom: theme.spacing(2),
-    },
-    marginBottom: theme.spacing(2),
-  },
+    '& > *': {
+      marginBottom: theme.spacing(2)
+    }
+  }
 }));
 
 export const ProfileForm: React.FC<FormikProps<ProfileFormValues>> = ({
   isSubmitting,
   submitForm,
-  dirty,
+  dirty
 }) => {
   const classes = useStyles();
   return (
@@ -29,7 +28,7 @@ export const ProfileForm: React.FC<FormikProps<ProfileFormValues>> = ({
         variant="outlined"
         name="email"
         type="email"
-        label="Primary email"
+        label="Email"
         disabled
       />
       <Field
@@ -47,6 +46,22 @@ export const ProfileForm: React.FC<FormikProps<ProfileFormValues>> = ({
         name="lastName"
         type="text"
         label="Last Name"
+      />
+      <Field
+        fullWidth
+        component={TextField}
+        variant="outlined"
+        name="password"
+        type="password"
+        label="Password"
+      />
+      <Field
+        fullWidth
+        component={TextField}
+        variant="outlined"
+        name="confirmPassword"
+        type="password"
+        label="Confirm Password"
       />
       {isSubmitting && <LinearProgress />}
       <Button

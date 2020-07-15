@@ -86,7 +86,6 @@ export class Base {
       this._authStorage.storeAuthData(response.data);
       return response.data;
     } catch (e) {
-      console.log("Error refreshing token");
       if (e.response?.status === 401) {
         throw new InvalidRefreshToken();
       }

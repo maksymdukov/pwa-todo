@@ -84,8 +84,6 @@ export const login = ({
 
 export const doLogin = (authData: AuthData): AppThunk => (dispatch) => {
   authPersistence.storeAuthData(authData);
-  console.log("jwtDecode", jwtDecode(authData.accessToken));
-
   const { email, firstName, lastName, picture, sub: id } = jwtDecode(
     authData.accessToken
   );
