@@ -85,6 +85,8 @@ export const userReducer = (
     case userActionTypes.FETCH_PROFILE_SUCCESS:
       return {
         ...state,
+        firstName: action.payload.profile.firstName,
+        lastName: action.payload.profile.lastName,
         profileLoading: false,
         ...action.payload,
       };

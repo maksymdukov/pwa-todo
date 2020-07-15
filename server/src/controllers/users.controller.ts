@@ -45,6 +45,17 @@ export const getProfile = async (req: Request, res: Response) => {
   res.json(req.user.getProfile());
 };
 
+export const saveProfile = async (req: Request, res: Response) => {
+  const {
+    firstName,
+    lastName,
+  }: { firstName: string; lastName: string } = req.body;
+  req.user.set('profile.firstName', firstName);
+  req.user.set('profile.lastName', lastName);
+  const saved = await req.user.save();
+  res.json(saved.getProfile());
+};
+
 export const changePassword = async (req: Request, res: Response) => {
   const { newPassword }: { newPassword: string } = req.body;
   req.user.password = newPassword;

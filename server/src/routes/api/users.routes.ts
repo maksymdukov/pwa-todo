@@ -11,6 +11,7 @@ import {
   unlinkAuthProvider,
   linkAuthProviderStart,
   getLinkToken,
+  saveProfile,
 } from '../../controllers/users.controller';
 import { body, query } from 'express-validator';
 import { validateInput } from '../../middlewares/validate-input';
@@ -52,8 +53,18 @@ usersRouter.get(
 
 usersRouter.get('/', isAuthenticated, getUsers);
 usersRouter.get('/profile', isAuthenticated, getProfile);
+usersRouter.patch(
+  '/profile',
+  isAuthenticated,
+  [
+    body('firstName').isLength({ min: 3 }),
+    body('lastName').isLength({ min: 3 }),
+  ],
+  validateInput,
+  saveProfile
+);
 usersRouter.post(
-  'changepassword',
+  '/changepassword',
   isAuthenticated,
   [body('newPassword').isLength({ min: 8 })],
   validateInput,

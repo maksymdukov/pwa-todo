@@ -27,6 +27,14 @@ export class UsersService extends Base {
     });
   }
 
+  async saveProfile(data: { firstName: string; lastName: string }) {
+    return this.request({
+      method: "PATCH",
+      url: "/profile",
+      data,
+    });
+  }
+
   unlinkProvider(provider: LoginProviders) {
     return this.request({
       method: "PATCH",

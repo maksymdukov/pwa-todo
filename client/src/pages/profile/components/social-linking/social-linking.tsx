@@ -4,7 +4,6 @@ import { GoogleIcon } from "components/icons/google";
 import { FacebookIcon } from "components/icons/facebook";
 import { config } from "config/config";
 import { LoginProviders, useAuthPopup } from "hooks/use-auth-popup";
-import { AuthData } from "pages/auth/signin/types";
 import { usersService } from "services/users.service";
 import { useSelector, useDispatch } from "react-redux";
 import { getUserState } from "store/user/selectors";
@@ -17,6 +16,7 @@ interface SocialsProps {
 const useStyles = makeStyles(({ spacing }) => ({
   social: {
     marginTop: spacing(3),
+    marginBottom: spacing(3),
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",
@@ -42,12 +42,9 @@ const SocialLinking = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const userState = useSelector(getUserState);
-  const onAuthSuccess = useCallback(
-    (data: AuthData) => {
-      dispatch(fetchProfile());
-    },
-    [dispatch]
-  );
+  const onAuthSuccess = useCallback(() => {
+    dispatch(fetchProfile());
+  }, [dispatch]);
   const { openPopup, error } = useAuthPopup({ onSuccess: onAuthSuccess });
 
   const handleLinkClick = (provider: LoginProviders) => async () => {
@@ -75,6 +72,11 @@ const SocialLinking = () => {
   };
   return (
     <>
+      {error && (
+        <Typography variant="h4" color="error">
+          {error}
+        </Typography>
+      )}
       <section className={classes.social}>
         <div className={classes.innerWrapper}>
           {/* if registered not via google initially */}
@@ -101,33 +103,30 @@ const SocialLinking = () => {
             </Button>
           )}
           <br />
-          <Button
-            variant="outlined"
-            className={classes.socialbtn}
-            onClick={
-              userState.linked?.facebookId
-                ? handleUnlinkClick(LoginProviders.facebook)
-                : handleLinkClick(LoginProviders.facebook)
-            }
-          >
-            <FacebookIcon className={classes.icon} />
-            {!userState.linked?.facebookId && "Link with Facebook"}
-            {userState.linked?.facebookId && (
-              <div style={{ display: "inline-block" }}>
-                <Typography className={classes.btnEmail} variant="caption">
-                  Email: {userState.linked.facebookEmail}
-                </Typography>
-                UNLINK
-              </div>
-            )}
-          </Button>
+          {!userState.facebookId && (
+            <Button
+              variant="outlined"
+              className={classes.socialbtn}
+              onClick={
+                userState.linked?.facebookId
+                  ? handleUnlinkClick(LoginProviders.facebook)
+                  : handleLinkClick(LoginProviders.facebook)
+              }
+            >
+              <FacebookIcon className={classes.icon} />
+              {!userState.linked?.facebookId && "Link with Facebook"}
+              {userState.linked?.facebookId && (
+                <div style={{ display: "inline-block" }}>
+                  <Typography className={classes.btnEmail} variant="caption">
+                    Email: {userState.linked.facebookEmail}
+                  </Typography>
+                  UNLINK
+                </div>
+              )}
+            </Button>
+          )}
         </div>
       </section>
-      {error && (
-        <Typography variant="h4" color="error">
-          {error}
-        </Typography>
-      )}
     </>
   );
 };
