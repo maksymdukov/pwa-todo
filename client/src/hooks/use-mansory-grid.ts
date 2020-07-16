@@ -47,9 +47,8 @@ export const useMansoryGrid = ({ itemMargin, itemWidth }: MansoryGridProps) => {
   const calculateLayout = useCallback(() => {
     // calculate cols number
     const sectionWidth = window.document.body.clientWidth - 240 - 32;
-    numberOfCols.current = Math.floor(
-      sectionWidth / (itemWidth + itemMargin * 2)
-    );
+    numberOfCols.current =
+      Math.floor(sectionWidth / (itemWidth + itemMargin * 2)) || 1; // minimum 1
 
     // cleanup
     dimensionRefs.current = {};
