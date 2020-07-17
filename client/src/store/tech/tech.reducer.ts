@@ -5,8 +5,14 @@ export enum ConnectionStatus {
   offline = "offline",
 }
 
+export enum TodoViewType {
+  masonry = "masonry",
+  list = "list",
+}
+
 export type TechStateType = {
   status: ConnectionStatus;
+  todoView: TodoViewType;
   beforeInstallPrompt: boolean;
   userInstallChoice: boolean | null;
   readyForOffline: boolean;
@@ -15,6 +21,7 @@ export type TechStateType = {
 
 const initialState: TechStateType = {
   status: navigator.onLine ? ConnectionStatus.online : ConnectionStatus.offline,
+  todoView: TodoViewType.masonry,
   beforeInstallPrompt: false,
   userInstallChoice: null,
   readyForOffline: false,
@@ -38,6 +45,8 @@ export const techReducer = (
       return { ...state, newVersionAvailable: true };
     case techActionTypes.READY_FOR_OFFLINE:
       return { ...state, readyForOffline: true };
+    case techActionTypes.CHANGE_TODO_VIEW_TYPE:
+      return { ...state, todoView: action.payload };
     default:
       return state;
   }

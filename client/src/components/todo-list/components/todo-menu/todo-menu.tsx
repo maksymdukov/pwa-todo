@@ -21,9 +21,13 @@ const TodoMenu = ({
 }: TodoMenuProps) => {
   const dispatch = useDispatch();
 
-  const wrapInMenuClose = (fn: Function) => () => {
-    fn();
+  const wrapInMenuClose = (fn: Function) => (
+    e: React.MouseEvent<HTMLLIElement>
+  ) => {
+    e.stopPropagation();
+    e.preventDefault();
     handleClose();
+    fn();
   };
   const handleDeleteClick = wrapInMenuClose(() => {
     dispatch(deleteTodoAction(todo.id));
@@ -32,9 +36,12 @@ const TodoMenu = ({
   // Dialog
   const [dialogOpened, setDialogOpened] = useState(false);
 
-  const closeDialog = useCallback(() => {
-    setDialogOpened(false);
-  }, [setDialogOpened]);
+  const closeDialog = useCallback(
+    (e: React.MouseEvent<HTMLElement>) => {
+      setDialogOpened(false);
+    },
+    [setDialogOpened]
+  );
   const openDialog = useCallback(() => {
     setDialogOpened(true);
   }, [setDialogOpened]);

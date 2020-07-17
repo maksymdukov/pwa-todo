@@ -54,16 +54,20 @@ const MansoryGrid = ({ children, itemMargin, itemWidth }: MansoryGridProps) => {
     };
   }, [calculateLayout]);
 
-  const chidlrenWithRefs = React.Children.map(children, function (child, idx) {
-    return React.cloneElement(child, {
-      ref: setHiddenItemRef(idx),
-      style: getHiddenItemStyle(),
-    });
-  });
+  const childrenLength = React.Children.count(children);
+
+  const chidlrenWithRefs = childrenLength
+    ? React.Children.map(children, function (child, idx) {
+        return React.cloneElement(child, {
+          ref: setHiddenItemRef(idx),
+          style: getHiddenItemStyle(),
+        });
+      })
+    : null;
 
   // If not yet calculated then do not render real items
   const positionedChildren =
-    calculatedCount !== 0
+    calculatedCount !== 0 && childrenLength
       ? React.Children.map(children, function (child, idx) {
           return React.cloneElement(child, {
             style: getItemStyle(idx),
@@ -72,7 +76,9 @@ const MansoryGrid = ({ children, itemMargin, itemWidth }: MansoryGridProps) => {
       : null;
 
   useEffect(() => {
-    calculateLayout();
+    if (React.Children.count(children)) {
+      calculateLayout();
+    }
   }, [children, calculateLayout]);
 
   return (

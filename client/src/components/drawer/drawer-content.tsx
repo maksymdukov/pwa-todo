@@ -17,6 +17,7 @@ import { DrawerListItem } from "./drawer-list-item";
 import { Link } from "react-router-dom";
 import NotificationsCount from "./notifications-count";
 import NotificationsSwitch from "./notifications-switch";
+import TodoViewSwitch from "./todo-view-switch";
 
 export type IMenuLink = {
   label: string;
@@ -85,14 +86,11 @@ export const DrawerContent = ({ closeDrawer }: DrawerContentProps) => {
         <>
           <List>
             {links.map((link, index) => (
-              <DrawerListItem
-                key={index}
-                closeDrawer={closeDrawer}
-                {...link}
-              />
+              <DrawerListItem key={index} closeDrawer={closeDrawer} {...link} />
             ))}
           </List>
           <Divider />
+          <TodoViewSwitch />
           <NotificationsSwitch />
         </>
       )}

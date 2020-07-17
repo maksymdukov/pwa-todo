@@ -8,7 +8,7 @@ interface Buckets {
 }
 
 interface ItemRefs {
-  [key: string]: HTMLDivElement | null;
+  [key: string]: HTMLElement | null;
 }
 
 interface DismensionRefs {
@@ -60,9 +60,9 @@ export const useMansoryGrid = ({ itemMargin, itemWidth }: MansoryGridProps) => {
     });
 
     // get elements height
-    Object.keys(itemRefs.current).map((key: string) => {
+    Object.keys(itemRefs.current).forEach((key: string) => {
       const element = itemRefs.current[key];
-      if (element instanceof HTMLDivElement) {
+      if (element instanceof HTMLElement) {
         const elementHeight = getElementHeight(element);
         dimensionRefs.current[key] = {
           height: elementHeight,
@@ -102,7 +102,7 @@ export const useMansoryGrid = ({ itemMargin, itemWidth }: MansoryGridProps) => {
   }, [setCalculatedCount, itemMargin, itemWidth]);
 
   const setHiddenItemRef = useCallback(
-    (idx: number) => (ref: HTMLDivElement | null) => {
+    (idx: number) => (ref: HTMLElement | null) => {
       itemRefs.current[idx] = ref;
     },
     []
@@ -113,10 +113,12 @@ export const useMansoryGrid = ({ itemMargin, itemWidth }: MansoryGridProps) => {
       const itemDimensions = dimensionRefs.current[idx];
       return {
         position: "absolute",
+        display: itemDimensions ? "block" : "none",
         width: itemWidth,
-        transform: `translate(${itemDimensions.translateX}px, ${itemDimensions.translateY}px)`,
+        transform: itemDimensions
+          ? `translate(${itemDimensions.translateX}px, ${itemDimensions.translateY}px)`
+          : "none",
         margin: itemMargin,
-        border: "1px solid black",
         transition: "transform .2s linear",
       };
     },

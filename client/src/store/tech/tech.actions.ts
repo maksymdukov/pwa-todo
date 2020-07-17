@@ -3,7 +3,7 @@ import { AppThunk } from "store/tools";
 import { techService } from "services/tech.service";
 import { wait } from "utils/timeout";
 import { getConnetionStatus } from "./tech.selectors";
-import { ConnectionStatus } from "./tech.reducer";
+import { ConnectionStatus, TodoViewType } from "./tech.reducer";
 import { syncTodos, syncReset } from "store/todos/todos.actions";
 import { fetchUnreadCount } from "store/unread-notifications/notifications.actions";
 
@@ -30,6 +30,11 @@ export const setReadyForOffline = (): TechActions => ({
 
 export const setNewVersionAvailable = (): TechActions => ({
   type: techActionTypes.NEW_VERSION_AVAILABLE,
+});
+
+export const changeTodoViewType = (todoView: TodoViewType): TechActions => ({
+  type: techActionTypes.CHANGE_TODO_VIEW_TYPE,
+  payload: todoView,
 });
 
 export const checkConnection = (

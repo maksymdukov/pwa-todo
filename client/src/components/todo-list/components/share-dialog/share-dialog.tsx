@@ -20,7 +20,7 @@ import { syncTodos } from "store/todos/todos.actions";
 import RemoveCircleIcon from "@material-ui/icons/RemoveCircle";
 
 interface ShareDialogProps {
-  closeDialog: () => void;
+  closeDialog: (e: React.MouseEvent<HTMLElement>) => void;
   dialogOpened: boolean;
   todo: ITodo;
 }

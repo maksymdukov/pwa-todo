@@ -27,3 +27,8 @@ export const getIsNewVersionAvailable = createSelector(
   getTechState,
   ({ newVersionAvailable }) => newVersionAvailable
 );
+
+export const getTodoViewType = createSelector(
+  getTechState,
+  ({ todoView }) => todoView
+);
