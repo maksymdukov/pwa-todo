@@ -25,10 +25,10 @@ export const AuthRoutes = () => {
 
   return (
     <Switch>
-      <Route path="/todos" component={Todos} />
+      <Route path="/notes" component={Todos} />
       <Route path="/profile" component={Profile} />
       <Route path="/notifications" component={Notifications} />
-      <Redirect to="/todos" />
+      <Redirect to="/notes" />
     </Switch>
   );
 };

@@ -94,7 +94,7 @@ const MansoryGridItem = React.forwardRef<
   return (
     <>
       <Link
-        to={`/todos/${todo.id}`}
+        to={`/notes/${todo.id}`}
         className={classes.link}
         ref={ref}
         style={style}

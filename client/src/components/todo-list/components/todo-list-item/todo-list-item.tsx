@@ -66,7 +66,7 @@ const TodoListItem = (props: TodoListItemProps) => {
   const isMyTodo = creator.id === userState.id;
 
   return (
-    <ListItem className={classes.item} to={`/todos/${id}`} component={Link}>
+    <ListItem className={classes.item} to={`/notes/${id}`} component={Link}>
       <ListItemAvatar>
         <UserAvatar
           alt={`${creator.profile.firstName} ${creator.profile.lastName}`}

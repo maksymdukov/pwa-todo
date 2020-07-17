@@ -55,11 +55,11 @@ const SingleTodo = ({ match, isNew }: SingleTodoProps) => {
     if (match.params.id) {
       if (todosInitialized && !setItemToEdit(match.params.id)) {
         // Can not find note
-        history.push("/todos");
+        history.push("/notes");
       }
     } else {
       // redirect
-      history.push("/todos");
+      history.push("/notes");
     }
   }, [
     isNew,

@@ -79,7 +79,7 @@ export const postTodo = ({
     }
 
     await dispatch(updateTodosFromIDB());
-    history.push("/todos");
+    history.push("/notes");
 
     // Try to send requests from outboundTodos
     await dispatch(syncOutboundRequests());

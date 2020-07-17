@@ -108,7 +108,7 @@ const NotiList = ({
         if (noti.reason === TodoHistoryReason.shared) {
           return (
             <Link
-              to={`/todos/${noti.data.id}`}
+              to={`/notes/${noti.data.id}`}
               key={noti.id}
               onClick={onNotiClick(noti.id)}
               className={classes.link}

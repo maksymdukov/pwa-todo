@@ -32,9 +32,9 @@ export type IMenuLink = {
 
 const links: IMenuLink[] = [
   {
-    label: "Todos",
+    label: "Notes",
     icon: ListAltIcon,
-    to: "/todos",
+    to: "/notes",
     highlighted: false,
     sub: [
       {

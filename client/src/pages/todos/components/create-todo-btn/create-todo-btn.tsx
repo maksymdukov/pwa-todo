@@ -16,7 +16,7 @@ const CreateTodoBtn = () => {
   const classes = useStyles();
   const history = useHistory();
   const handleBtnClick = () => {
-    history.push("/todos/new");
+    history.push("/notes/new");
   };
   return (
     <Fab className={classes.addBtn} color="primary" onClick={handleBtnClick}>
