@@ -7,11 +7,9 @@ import {
   ListItemAvatar,
   makeStyles,
   ListItemText,
-  Typography,
   ListSubheader,
 } from "@material-ui/core";
 import { ITodo, ISharedUser } from "models/ITodo";
-import { blue } from "@material-ui/core/colors";
 import UserAvatar from "components/user-avatar";
 import UserAutocomplete from "../user-autocomplete/user-autocomplete";
 import { todosService } from "services/todos.service";

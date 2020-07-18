@@ -15,7 +15,7 @@ import CloudOffOutlinedIcon from "@material-ui/icons/CloudOffOutlined";
 import { drawerWidth } from "components/layout/layout";
 import { useSelector, useDispatch } from "react-redux";
 import { getIsAuthenticated, getIsAuthenticating } from "store/user/selectors";
-import { Link, useHistory } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { AccountMenu } from "./account-menu";
 import { getSyncState } from "store/todos/todos.selectors";
 import { syncTodos } from "store/todos/todos.actions";
@@ -59,7 +59,6 @@ interface NavbarProps {
 }
 
 export const Navbar = ({ openDrawer }: NavbarProps) => {
-  const history = useHistory();
   const syncStatus = useSelector(getSyncState);
   const isAuth = useSelector(getIsAuthenticated);
   const isAuthenticating = useSelector(getIsAuthenticating);

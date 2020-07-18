@@ -1,7 +1,6 @@
 import { Response, Request } from 'express';
 import { User, UserDocument } from '../models/User';
 import { Todo } from '../models/Todo';
-import webpush from 'web-push';
 import { TodoHistory } from '../models/TodoHistory';
 import { TodoHistoryReason } from '../models/TodoHistoryReason';
 import { TodoRecordDocument } from '../models/TodoRecord';
@@ -56,7 +55,7 @@ export const postTodo = async (req: Request, res: Response) => {
   });
 
   // Save history record;
-  const historyRecord = await TodoHistory.build({
+  await TodoHistory.build({
     userIds: [user.id],
     todo: newTodo,
     reason: TodoHistoryReason.created,
@@ -87,7 +86,7 @@ export const editTodo = async (req: Request, res: Response) => {
   console.log('todo', todo);
 
   // Savee history record
-  const historyRecord = await TodoHistory.build({
+  await TodoHistory.build({
     userIds: [req.user.id],
     todo: savedTodo,
     reason: TodoHistoryReason.updated,
@@ -197,7 +196,7 @@ export const revokeTodoShare = async (req: Request, res: Response) => {
   const populatedTodo = await Todo.findTodoById(todoId);
 
   // Savee history record
-  const historyRecord = await TodoHistory.build({
+  await TodoHistory.build({
     userIds: [user.id, userId],
     todo: populatedTodo,
     reason: TodoHistoryReason.unshared,

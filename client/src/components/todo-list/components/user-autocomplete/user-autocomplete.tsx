@@ -12,11 +12,11 @@ import { todosService } from "services/todos.service";
 import { syncTodos } from "store/todos/todos.actions";
 import { useDispatch } from "react-redux";
 
-const useStyles = makeStyles(({}) => ({
+const useStyles = makeStyles({
   shareBtn: {
     flexShrink: 0,
   },
-}));
+});
 
 interface UserAutocompleteProps {
   todo: ITodo;

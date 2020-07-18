@@ -5,7 +5,6 @@ import { config } from '..';
 
 const REFRESH_TOKEN_TTL = 1000 * 3600 * 24 * 30; //30 days
 const ACCESS_TOKEN_TTL = '1 day';
-// const ACCESS_TOKEN_TTL = 100;
 
 export const generateAccessToken = (user: UserDocument): string => {
   const expiresIn = ACCESS_TOKEN_TTL;

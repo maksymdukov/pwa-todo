@@ -1,9 +1,8 @@
-import React, { RefObject, MutableRefObject } from "react";
+import React, { MutableRefObject } from "react";
 import { Box, IconButton, Paper, TextField } from "@material-ui/core";
 import DragIndicatorIcon from "@material-ui/icons/DragIndicator";
 import { DraggableProvidedDragHandleProps } from "react-beautiful-dnd";
 import { makeStyles } from "@material-ui/core/styles";
-import TextareaAutosize from "@material-ui/core/TextareaAutosize";
 
 const useStyles = makeStyles({
   label: {

@@ -1,9 +1,9 @@
 import bcrypt from 'bcrypt';
-import mongoose, { Document, MongooseFilterQuery } from 'mongoose';
+import mongoose, { MongooseFilterQuery } from 'mongoose';
 import { ProfileDocument, profileSchema } from './Profile';
 import { WebSubscription } from '../interfaces/IWebSubscription';
 import { escapeRegExp } from '../util/regexp';
-import { SendResult, WebPushError } from 'web-push';
+import { SendResult } from 'web-push';
 import { sendWebPushNotification } from '../services/webpush';
 import {
   generateAccessToken,

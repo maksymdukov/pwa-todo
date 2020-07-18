@@ -54,34 +54,6 @@ export const fetchProfile = (): AppThunk => async (dispatch, getState) => {
   }
 };
 
-const timeout = (timeout: number): Promise<void> =>
-  new Promise((resolve) => {
-    setTimeout(() => {
-      resolve();
-    }, timeout);
-  });
-
-export const login = ({
-  email,
-  password,
-}: {
-  email: string;
-  password: string;
-}): AppThunk<Promise<void>> => async (dispatch) => {
-  dispatch(loginStart());
-  await timeout(1000);
-  dispatch(
-    loginSuccess({
-      email: "test@test.com",
-      firstName: "Max",
-      lastName: "Dukov",
-      picture: "",
-      id: "someId",
-    })
-  );
-  return;
-};
-
 export const doLogin = (authData: AuthData): AppThunk => (dispatch) => {
   authPersistence.storeAuthData(authData);
   const { email, firstName, lastName, picture, sub: id } = jwtDecode(

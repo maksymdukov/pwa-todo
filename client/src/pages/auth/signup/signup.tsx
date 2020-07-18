@@ -23,7 +23,7 @@ interface SubmitStatus {
 
 const SignUp = (props: RouteComponentProps) => {
   const classes = useLoginStyles();
-  const [{ success, error }, setStatus] = useState<SubmitStatus>({
+  const [{ success }, setStatus] = useState<SubmitStatus>({
     error: null,
     success: false,
   });

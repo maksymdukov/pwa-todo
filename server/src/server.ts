@@ -1,5 +1,4 @@
 import { config } from './config';
-import errorHandler from 'errorhandler';
 import http from 'http';
 import socketio from 'socket.io';
 import socketioJWT from 'socketio-jwt';

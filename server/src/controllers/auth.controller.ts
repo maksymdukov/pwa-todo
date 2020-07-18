@@ -3,7 +3,10 @@ import { User, AuthProviders, UserDocument } from '../models/User';
 import { config } from '../config';
 import { RequestValidationError } from '../errors/validation-error';
 import { randomBytes } from 'crypto';
-import { mailerClient, sendActivationToken } from '../services/nodemailer';
+import {
+  sendActivationToken,
+  sendResetPasswordToken,
+} from '../services/nodemailer';
 import passport from 'passport';
 import { PassportAuthProviders } from '../interfaces/passport-auth-providers';
 import { CustomRequestError } from '../errors/request-error';
@@ -165,14 +168,7 @@ export const resetPasswordStart = async (req: Request, res: Response) => {
   );
   await user.save();
 
-  const resetLink = `${config.CLIENT_PUBLIC_URL}/resetpasswordfinish?email=${user.email}&token=${user.passwordResetToken}`;
-  // send email
-  await mailerClient.sendMail({
-    from: config.MAIL_USER,
-    to: user.email,
-    subject: '[PWA-NOTES-APP] Reset password request',
-    html: `<a href="${resetLink}">Click</a> to reset your password. Type this link manually: ${resetLink}`,
-  });
+  await sendResetPasswordToken(user.email, user.passwordResetToken);
   res.send();
 };
 

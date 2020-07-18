@@ -106,5 +106,5 @@ export const useSocketIO = () => {
     });
     return socketRef.current;
   }, [dispatch, socketRef, updateNotifications]);
-  return { initSocket, socketRef: socketRef };
+  return { initSocket, socketRef };
 };

@@ -1,13 +1,12 @@
 import React, { ChangeEvent } from "react";
-import { Paper, TextField } from "@material-ui/core";
-import AddIcon from "@material-ui/icons/Add";
+import { TextField } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 
 export const useStyles = makeStyles({
   newRecord: {
     display: "flex",
-    padding: 8
-  }
+    padding: 8,
+  },
 });
 
 type NewRecordProps = {
