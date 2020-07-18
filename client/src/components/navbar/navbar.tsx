@@ -25,14 +25,23 @@ import { SyncStatus } from "store/todos/todos.reducer";
 import InstallAppBtn from "./install-app-btn";
 
 const useStyles = makeStyles((theme) => ({
-  title: {
-    flexGrow: 1,
-  },
   appBar: {
     [theme.breakpoints.up("sm")]: {
       width: `calc(100% - ${drawerWidth}px)`,
       marginLeft: drawerWidth,
     },
+  },
+  logo: {
+    display: "flex",
+    alignItems: "center",
+    marginRight: "auto",
+    color: "inherit",
+    textDecoration: "none",
+  },
+  logoIcon: {
+    width: "2rem",
+    height: "2rem",
+    marginRight: ".5rem",
   },
   menuButton: {
     marginRight: theme.spacing(2),
@@ -76,15 +85,16 @@ export const Navbar = ({ openDrawer }: NavbarProps) => {
         >
           <MenuIcon />
         </IconButton>
-        <Typography
-          variant="h6"
-          noWrap
-          color="inherit"
-          className={classes.title}
-          onClick={() => history.push("/")}
-        >
-          Notes
-        </Typography>
+        <Link to="/" className={classes.logo}>
+          <img
+            className={classes.logoIcon}
+            src="/android-icon-48x48.png"
+            alt="notes"
+          />
+          <Typography variant="h6" noWrap color="inherit">
+            Notes
+          </Typography>
+        </Link>
         <InstallAppBtn />
         {!isAuth && !isAuthenticating && (
           <Button

@@ -52,7 +52,7 @@ export interface SetTotal {
   payload: { total: number };
 }
 
-type PaginatedActions<T> =
+export type PaginatedActions<T> =
   | FetchStart
   | FetchSuccess<T>
   | FetchFail
@@ -85,6 +85,7 @@ export const makePaginatedReducer = <D>(
           ...state,
           status: PaginatedStatus.FETCH_IN_PROGRESS,
           error: null,
+          items: [],
         };
       case `${name}/${paginatedActionTypes.FETCH_SUCCESS}`:
         return {

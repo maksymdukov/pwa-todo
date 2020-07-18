@@ -22,7 +22,7 @@ export {
   fetchFail,
   fetchStart,
   fetchSuccess,
-  fetchReset,
+  fetchReset as fetchResetUnreadNotifications,
   getError as getUnreadNotificationsError,
   getItems as getUnreadNotificationsItems,
   getPagination as getUnreadNotificationsPagination,

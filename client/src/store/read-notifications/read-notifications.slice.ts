@@ -21,7 +21,7 @@ export {
   fetchFail,
   fetchStart,
   fetchSuccess,
-  fetchReset,
+  fetchReset as fetchResetReadNotifications,
   getError as getReadNotificationsError,
   getItems as getReadNotificationsItems,
   getPagination as getReadNotificationsPagination,

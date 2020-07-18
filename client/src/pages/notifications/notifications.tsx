@@ -5,11 +5,13 @@ import { fetchUnreadNotifications } from "store/unread-notifications/notificatio
 import {
   getUnreadNotificationsItems,
   getUnreadNotificationsStatus,
+  fetchResetUnreadNotifications,
 } from "store/unread-notifications/notifications.slice";
 import { fetchReadNotifications } from "store/read-notifications/read-notifications.actions";
 import {
   getReadNotificationsItems,
   getReadNotificationsStatus,
+  fetchResetReadNotifications,
 } from "store/read-notifications/read-notifications.slice";
 import MarkRead from "./components/mark-read/mark-read";
 
@@ -41,6 +43,7 @@ const Notifications = () => {
             fetchAction={fetchUnreadNotifications}
             getItems={getUnreadNotificationsItems}
             getStatus={getUnreadNotificationsStatus}
+            resetAction={fetchResetUnreadNotifications}
             unread={true}
           />
         </>
@@ -50,6 +53,7 @@ const Notifications = () => {
           fetchAction={fetchReadNotifications}
           getItems={getReadNotificationsItems}
           getStatus={getReadNotificationsStatus}
+          resetAction={fetchResetReadNotifications}
           unread={false}
         />
       )}

@@ -25,12 +25,14 @@ import { Link } from "react-router-dom";
 import { notificationsService } from "services/notifications.service";
 import { fetchUnreadCount } from "store/unread-notifications/notifications.actions";
 import OfflineLabel from "components/typography/offline";
+import { Action } from "redux";
 
 interface NotiListProps {
   unread: boolean;
   getItems: (state: AppState) => INotification[];
   getStatus: (state: AppState) => PaginatedStatus;
   fetchAction: () => AppThunk;
+  resetAction: () => Action;
 }
 
 const useStyles = makeStyles({
@@ -54,6 +56,7 @@ const NotiList = ({
   getItems,
   getStatus,
   fetchAction,
+  resetAction,
 }: NotiListProps) => {
   const classes = useStyles();
   const connectionStatus = useSelector(getConnetionStatus);
@@ -70,6 +73,12 @@ const NotiList = ({
       dispatch(fetchAction());
     }
   }, [dispatch, fetchAction, connectionStatus, syncStatus]);
+
+  useEffect(() => {
+    return () => {
+      dispatch(resetAction());
+    };
+  }, [dispatch, resetAction]);
 
   if (status === PaginatedStatus.FETCH_IN_PROGRESS) {
     return <Spinner isActive={true} />;
@@ -98,7 +107,7 @@ const NotiList = ({
               <UserAvatar src={noti.sender?.profile?.picture} />
             </ListItemAvatar>
             <ListItemText>
-              <Typography>Email: {noti.sender?.email || 'Deleted'}</Typography>
+              <Typography>Email: {noti.sender?.email || "Deleted"}</Typography>
               <Typography>Type: {noti.reason}</Typography>
               <Typography>Title: {noti.data.title}</Typography>
             </ListItemText>
