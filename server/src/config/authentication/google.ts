@@ -81,11 +81,7 @@ passport.use(
         return done(null, false);
       }
       return done(null, {
-        email:
-          (profile.emails &&
-            profile.emails.length &&
-            profile.emails[0].value) ||
-          '',
+        email: profile.emails[0]?.value || '',
         id: profile.id,
         linkToken: req.query.state,
       });

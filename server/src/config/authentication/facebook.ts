@@ -25,12 +25,10 @@ if (passportConfig.clientID) {
       profile,
       done
     ) {
-      console.log(profile);
       const possibleUser = await User.findByExternalId(
         AuthProviders.facebook,
         profile.id
       );
-      console.log('possibleUser', possibleUser);
       if (!possibleUser) {
         // check if email is already registered
         if (profile.emails && profile.emails.length) {
@@ -50,7 +48,6 @@ if (passportConfig.clientID) {
           lastName: profile.name.familyName,
           picture: profile.photos[0].value,
         });
-        console.log('newUser', newUser);
         return done(null, newUser);
       }
       // return user from DB or create him
@@ -65,7 +62,7 @@ passport.use(
     {
       clientID: config.FACEBOOK_CLIENT_ID,
       clientSecret: config.FACEBOOK_CLIENT_SECRET,
-      callbackURL: `${config.PUBLIC_URL}/api/v0/auth/facebook-link/callback`,
+      callbackURL: `${config.PUBLIC_URL}/api/v0/users/facebook-link/callback`,
       profileFields: [
         'id',
         'displayName',
@@ -74,8 +71,9 @@ passport.use(
         'first_name',
         'last_name',
       ],
+      passReqToCallback: true,
     },
-    async function (accessToken, refreshToken, profile, done) {
+    async function (req, accessToken, refreshToken, profile, done) {
       const possibleUser = await User.findByExternalId(
         AuthProviders.facebook,
         profile.id
@@ -83,7 +81,11 @@ passport.use(
       if (possibleUser) {
         return done(null, false);
       }
-      return done(null, { accessToken });
+      return done(null, {
+        email: profile.emails[0]?.value || '',
+        id: profile.id,
+        linkToken: req.query.state,
+      });
     }
   )
 );
