@@ -3,7 +3,7 @@ import mongoose, { MongooseFilterQuery } from 'mongoose';
 import { ProfileDocument, profileSchema } from './Profile';
 import { WebSubscription } from '../interfaces/IWebSubscription';
 import { escapeRegExp } from '../util/regexp';
-import { SendResult } from 'web-push';
+import { SendResult, WebPushError } from 'web-push';
 import { sendWebPushNotification } from '../services/webpush';
 import {
   generateAccessToken,
@@ -170,9 +170,6 @@ const findByExternalId: UserModel['findByExternalId'] = async function (
   provider,
   id
 ) {
-  console.log('google id', typeof id);
-  console.log('provider', provider);
-
   return this.findOne({
     $or: [{ [provider]: id }, { [`linked.${provider}`]: id }],
   });
@@ -256,8 +253,20 @@ const sendNotification: UserModel['sendNotification'] = async function (
   const subPromises = (user.webSubscriptions || []).map((sub) =>
     sendWebPushNotification(sub, data)
   );
-  // TODO handle errors - remove subscriptions if they are invalid
-  return Promise.allSettled(subPromises);
+  const results = await Promise.allSettled(subPromises);
+
+  // cleanup invalid subscriptions
+  results.forEach((res) => {
+    if (res.status === 'rejected') {
+      const error: WebPushError = res.reason;
+      if (error.statusCode === 404 || error.statusCode === 410) {
+        // remove subscription. it's no longer valid
+        this.removeSubscription(userId, error.endpoint);
+      }
+    }
+  });
+
+  return results;
 };
 
 const removeSubscription: UserModel['removeSubscription'] = async function (

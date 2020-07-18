@@ -14,8 +14,6 @@ const LINK_TOKEN_EXPIRES = 1000 * 60; // 1 min
 
 export const checkWebPushSubscription = async (req: Request, res: Response) => {
   const { endpoint } = req.query as { endpoint: string };
-  console.log('endpoint', endpoint);
-
   const found = req.user.webSubscriptions.find(
     (websub) => websub.endpoint === endpoint
   );
@@ -161,8 +159,8 @@ export const linkAuthProvider = (authProvider: PassportAuthProviders) => async (
         authUser.set('linked.facebookId', user.id);
         authUser.set('linked.facebookEmail', user.email);
       }
-      const savedUser = await authUser.save();
-      console.log('savedUser', savedUser);
+
+      await authUser.save();
 
       res.render('authenticated', {
         error: '',

@@ -7,7 +7,7 @@ interface Storage {
   setItem: (key: string, obj: string) => void;
 }
 
-// TODO in order to use chrome sync API, persist auth data in IndexedDB
+// TODO in order to use service worker sync API, persist auth data in IndexedDB
 
 export class AuthPersistence {
   _storage: Storage;

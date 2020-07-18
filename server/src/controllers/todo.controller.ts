@@ -83,8 +83,6 @@ export const editTodo = async (req: Request, res: Response) => {
   records && (todo.records = records);
   const savedTodo = await todo.save();
 
-  console.log('todo', todo);
-
   // Savee history record
   await TodoHistory.build({
     userIds: [req.user.id],
