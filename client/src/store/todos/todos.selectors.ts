@@ -22,6 +22,15 @@ export const getMyTodoItems = createSelector(
     todos.filter((todo) => todo.creator.email === userState.email)
 );
 
+export const getIshareTodoItems = createSelector(
+  getTodoItems,
+  getUserState,
+  (todos, userState) =>
+    todos.filter(
+      (todo) => todo.creator.email === userState.email && todo.shared?.length
+    )
+);
+
 export const getSharedWithMeTodos = createSelector(
   getTodoItems,
   getUserState,

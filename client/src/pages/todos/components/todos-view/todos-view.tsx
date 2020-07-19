@@ -8,6 +8,7 @@ import {
   getSyncState,
   getSharedWithMeTodos,
   getMyTodoItems,
+  getIshareTodoItems,
 } from "store/todos/todos.selectors";
 import { TodosScopes } from "pages/todos/todo-scopes";
 import { Typography } from "@material-ui/core";
@@ -26,6 +27,8 @@ const getPageLabel = (scope: TodosScopes): string => {
       return "My notes";
     case TodosScopes.shared:
       return "Notes shared with me";
+    case TodosScopes.ishare:
+      return "Notes I shared";
     default:
       return "";
   }
@@ -35,6 +38,7 @@ const todosSelector = {
   [TodosScopes.all]: getTodoItems,
   [TodosScopes.shared]: getSharedWithMeTodos,
   [TodosScopes.my]: getMyTodoItems,
+  [TodosScopes.ishare]: getIshareTodoItems,
 };
 
 const TodosView = ({ scope }: TodosViewProps) => {

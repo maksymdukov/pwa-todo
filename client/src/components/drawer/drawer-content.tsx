@@ -3,6 +3,7 @@ import ListAltIcon from "@material-ui/icons/ListAlt";
 import NotificationsIcon from "@material-ui/icons/Notifications";
 import PermIdentityRoundedIcon from "@material-ui/icons/PermIdentityRounded";
 import PeopleOutlineRoundedIcon from "@material-ui/icons/PeopleOutlineRounded";
+import ShareIcon from "@material-ui/icons/Share";
 import {
   List,
   Divider,
@@ -46,6 +47,11 @@ const links: IMenuLink[] = [
         label: "Shared with me",
         icon: PeopleOutlineRoundedIcon,
         to: "/shared",
+      },
+      {
+        label: "I shared",
+        icon: ShareIcon,
+        to: "/ishare",
       },
     ],
   },

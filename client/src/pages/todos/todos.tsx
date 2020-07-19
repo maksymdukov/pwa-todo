@@ -21,6 +21,10 @@ const Todos = ({ match }: RouteComponentProps) => {
         render={(props) => <TodosView scope={TodosScopes.shared} {...props} />}
       />
       <Route
+        path={match.path + "/ishare"}
+        render={(props) => <TodosView scope={TodosScopes.ishare} {...props} />}
+      />
+      <Route
         path={match.path + "/new"}
         exact
         render={(props) => <SingleTodo isNew {...props} />}
