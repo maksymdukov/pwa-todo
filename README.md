@@ -4,7 +4,7 @@ https://pwa-offline-notes.herokuapp.com
 
 ## Features
 
-- offline-first approach (IndexedDB, Chache API)
+- offline-first approach (IndexedDB, Cache API, Service worker)
 - incremental synchronization
 - ability to install app (PWA)
 - sharing notes with registered users (read-only)
