@@ -38,7 +38,9 @@ export const removeWebPushSubscription = async (
 
 export const getUsers = async (req: Request, res: Response) => {
   const { email } = req.query as { email: string };
-  const users = await User.getUsers({ email });
+  console.log('req.user.email', req.user.email);
+
+  const users = await User.getUsers({ email, userEmail: req.user.email });
   res.json(users);
 };
 

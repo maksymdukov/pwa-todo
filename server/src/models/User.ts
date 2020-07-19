@@ -68,7 +68,7 @@ export type UserModel = mongoose.Model<UserDocument> & {
   ) => Promise<UserDocument | null>;
   getUsers: (
     this: UserModel,
-    attrs: { email?: string }
+    attrs: { email?: string; userEmail: string }
   ) => Promise<Pick<UserDocument, 'email' | 'profile' | 'id'>[]>;
   sendNotification(
     this: UserModel,
@@ -227,10 +227,12 @@ const createUser: UserModel['createUser'] = async function (
   }
 };
 
-const getUsers: UserModel['getUsers'] = async function ({ email }) {
-  const query: MongooseFilterQuery<UserDocument> = {};
+const getUsers: UserModel['getUsers'] = async function ({ email, userEmail }) {
+  const query: MongooseFilterQuery<UserDocument> = {
+    $and: [{ email: { $ne: userEmail } }],
+  };
   if (typeof email === 'string' && email !== '') {
-    query.email = new RegExp(`^${escapeRegExp(email)}`);
+    query.$and.push({ email: new RegExp(`^${escapeRegExp(email)}`) });
   }
   return this.find(
     query,

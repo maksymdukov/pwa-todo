@@ -80,10 +80,6 @@ const NotiList = ({
     };
   }, [dispatch, resetAction]);
 
-  if (status === PaginatedStatus.FETCH_IN_PROGRESS) {
-    return <Spinner isActive={true} />;
-  }
-
   const onNotiClick = (id: string) => async () => {
     if (unread) {
       await notificationsService.markRead([id]);
@@ -91,6 +87,17 @@ const NotiList = ({
     }
   };
 
+  if (status === PaginatedStatus.FETCH_IN_PROGRESS) {
+    return <Spinner isActive={true} />;
+  }
+
+  if (status === PaginatedStatus.FETCH_SUCCESS && !items.length) {
+    return (
+      <Typography variant="h5" color="textSecondary">
+        There are no nofitications yet
+      </Typography>
+    );
+  }
   return connectionStatus === ConnectionStatus.online ? (
     <List className={clsx(!unread && classes.readList)}>
       {items.map((noti) => {
