@@ -7,7 +7,7 @@ https://pwa-offline-notes.herokuapp.com
 - offline-first approach (IndexedDB, Cache API, Service worker)
 - incremental synchronization
 - ability to install app (PWA)
-- sharing notes with registered users (read-only)
+- sharing notes with registered users (read-only, realtime via websockets)
 - native notifications (webpush)
 - ordinary register flow (email, activation)
 - third party auth providers (google, facebook)
