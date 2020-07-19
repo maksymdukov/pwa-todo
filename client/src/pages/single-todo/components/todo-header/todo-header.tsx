@@ -1,5 +1,5 @@
 import React, { SetStateAction } from "react";
-import { Box, TextField, Typography } from "@material-ui/core";
+import { TextField, Typography, makeStyles } from "@material-ui/core";
 import { ITodo } from "models/ITodo";
 
 type TodoHeaderProps = {
@@ -8,16 +8,36 @@ type TodoHeaderProps = {
   editable: boolean;
 };
 
+const useStyles = makeStyles(({ spacing, breakpoints }) => ({
+  wrapper: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: spacing(2),
+    marginBottom: spacing(2),
+    flexWrap: "wrap",
+  },
+  owner: {
+    [breakpoints.down("sm")]: {
+      order: -1,
+      flexBasis: "100%",
+      marginBottom: spacing(2),
+    },
+  },
+  title: {
+    [breakpoints.down("sm")]: {
+      order: 1,
+      flexBasis: "100%",
+    },
+  },
+}));
+
 const TodoHeader = ({ todo, setTodo, editable }: TodoHeaderProps) => {
+  const classes = useStyles();
   return (
-    <Box
-      display="flex"
-      justifyContent="space-between"
-      alignItems="center"
-      mt={2}
-      mb={2}
-    >
+    <section className={classes.wrapper}>
       <TextField
+        className={classes.title}
         disabled={!editable}
         label="Title"
         variant="outlined"
@@ -26,10 +46,14 @@ const TodoHeader = ({ todo, setTodo, editable }: TodoHeaderProps) => {
           setTodo({ ...todo, title: e.target.value });
         }}
       />
-      <Typography>
-        Owner: {todo.creator.profile.firstName} {todo.creator.profile.lastName}
-      </Typography>
-    </Box>
+      <div className={classes.owner}>
+        <Typography variant="subtitle2">Owner</Typography>
+        <Typography variant="body2">
+          {todo.creator.profile.firstName} {todo.creator.profile.lastName}
+        </Typography>
+        <Typography variant="body2">{todo.creator.email}</Typography>
+      </div>
+    </section>
   );
 };
 
