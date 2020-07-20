@@ -46,7 +46,6 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(passport.initialize());
 app.use(lusca.xframe('SAMEORIGIN'));
-app.use(lusca.xssProtection(true));
 app.use(
   express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 })
 );

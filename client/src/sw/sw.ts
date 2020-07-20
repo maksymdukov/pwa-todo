@@ -97,8 +97,8 @@ self.addEventListener("push", (event) => {
   if (data.reason === TodoHistoryReason.shared) {
     event.waitUntil(
       self.registration.showNotification(`You've got new shared note`, {
-        icon: "/logo192.png",
-        badge: "/logo192.png",
+        icon: "/android-icon-192x192.png",
+        badge: "/android-icon-192x192.png",
         data: {
           url: `/notifications`,
         },
