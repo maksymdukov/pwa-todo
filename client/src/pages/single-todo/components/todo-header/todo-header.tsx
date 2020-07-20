@@ -6,6 +6,7 @@ type TodoHeaderProps = {
   todo: ITodo;
   setTodo: (value: SetStateAction<ITodo>) => void;
   editable: boolean;
+  isNew?: boolean;
 };
 
 const useStyles = makeStyles(({ spacing, breakpoints }) => ({
@@ -32,7 +33,7 @@ const useStyles = makeStyles(({ spacing, breakpoints }) => ({
   },
 }));
 
-const TodoHeader = ({ todo, setTodo, editable }: TodoHeaderProps) => {
+const TodoHeader = ({ todo, setTodo, editable, isNew }: TodoHeaderProps) => {
   const classes = useStyles();
   return (
     <section className={classes.wrapper}>
@@ -46,13 +47,15 @@ const TodoHeader = ({ todo, setTodo, editable }: TodoHeaderProps) => {
           setTodo({ ...todo, title: e.target.value });
         }}
       />
-      <div className={classes.owner}>
-        <Typography variant="subtitle2">Owner</Typography>
-        <Typography variant="body2">
-          {todo.creator.profile.firstName} {todo.creator.profile.lastName}
-        </Typography>
-        <Typography variant="body2">{todo.creator.email}</Typography>
-      </div>
+      {!isNew && (
+        <div className={classes.owner}>
+          <Typography variant="subtitle2">Owner</Typography>
+          <Typography variant="body2">
+            {todo.creator.profile.firstName} {todo.creator.profile.lastName}
+          </Typography>
+          <Typography variant="body2">{todo.creator.email}</Typography>
+        </div>
+      )}
     </section>
   );
 };

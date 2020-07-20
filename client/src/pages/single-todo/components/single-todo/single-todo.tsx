@@ -101,7 +101,12 @@ const SingleTodo = ({ match, isNew }: SingleTodoProps) => {
         <BackBtn />
       </div>
       {isNew && "Create new note"}
-      <TodoHeader setTodo={setTodo} todo={todo} editable={isEditable} />
+      <TodoHeader
+        isNew={isNew}
+        setTodo={setTodo}
+        todo={todo}
+        editable={isEditable}
+      />
       <TodoRecords
         editable={isEditable}
         todoRecords={todo.records}
