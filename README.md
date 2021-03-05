@@ -2,6 +2,9 @@
 
 https://pwa-offline-notes.herokuapp.com
 
+## Demo video
+[![](http://img.youtube.com/vi/h66GsbuojRM/0.jpg)](http://www.youtube.com/watch?v=h66GsbuojRM "PWA offline notes")
+
 ## Features
 
 - offline-first approach (IndexedDB, Cache API, Service worker)
